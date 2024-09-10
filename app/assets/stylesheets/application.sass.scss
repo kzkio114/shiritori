@@ -1,0 +1,5 @@
+// Entry point for your Sass build
+@tailwind base; // Tailwind CSS の基本スタイルを読み込む
+@tailwind components; // Tailwind CSS のコンポーネントスタイルを読み込む
+@tailwind utilities; // Tailwind CSS のユーティリティクラスを読み込む
+@import "custom"; // カスタムスタイルのインポート（参考用）

@@ -1,0 +1,3 @@
+js: bun run build --watch
+sass: bun run build:sass --watch
+postcss: bun run build:postcss --watch

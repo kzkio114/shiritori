@@ -1,0 +1,26 @@
+.custom {
+  width: 500px; /* 幅を500pxに設定 */
+  height: 50px; /* 高さを50pxに設定 */
+  background-color: #971616; /* 背景色を赤 (#971616) に設定 */
+  border-radius: 50%; /* 丸い形にするためにボーダーの半径を50%に設定 */
+  text-align: center; /* テキストを中央に揃える */
+  font-size: 15px;    /* 文字サイズを調整 */
+  color: #fff;        /* 文字色を白に設定 */
+  line-height: 50px;  /* 高さに合わせて垂直方向も中央揃え */
+}
+
+
+@keyframes moveClouds {
+  0% {
+    transform: translateX(100vw); /* 画面右外から開始 */
+  }
+  100% {
+    transform: translateX(-100vw); /* 画面左外で終了 */
+  }
+}
+
+/* 個別にアニメーションを設定 */
+.cloud1 {
+  top: 100px; /* 高さを設定 */
+  animation: moveClouds 30s linear infinite; /* 流れる時間を設定 */
+}

@@ -1,0 +1,24 @@
+<div class="bg-teal-500 text-white p-4 rounded-lg shadow-md">
+  これはティール色の背景と白い文字です (Tailwind CSS)
+</div>
+
+<div class="text-red-500 p-2">
+  これは赤い文字です (Tailwind CSS)
+</div>
+
+<h1 class="text-3xl font-bold">これはRailsで生成された文字です</h1>
+
+<!-- データベースの確認用 -->
+<%# @test_tables.each do |test_table| % >
+  <div class="alert alert-error">
+    <span><%= test_table.test_data % ></span>
+  </div>
+<% end %> 
+
+<!-- Reactのエントリーポイント -->
+<div id="root"></div>
+
+
+<div class="custom cloud1">
+<%= link_to 'これは、カスタムcssのテストです。押すとページ遷移します！', tops_show_path, data: { turbo: false } %>
+</div>
