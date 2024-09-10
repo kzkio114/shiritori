@@ -1,4 +1,4 @@
-FROM ruby:3.3.1 
+FROM ruby:3.3.1
 
 # 環境変数の設定
 ENV LANG C.UTF-8
