@@ -10,5 +10,31 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 0) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_11_132318) do
+  create_table "shiritori_games", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_shiritori_games_on_user_id"
+  end
+
+  create_table "shiritori_words", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "word"
+    t.bigint "shiritori_game_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["shiritori_game_id"], name: "index_shiritori_words_on_shiritori_game_id"
+    t.index ["user_id"], name: "index_shiritori_words_on_user_id"
+  end
+
+  create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_foreign_key "shiritori_games", "users"
+  add_foreign_key "shiritori_words", "shiritori_games"
+  add_foreign_key "shiritori_words", "users"
 end

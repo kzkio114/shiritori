@@ -1,0 +1,2 @@
+class ShiritoriGame < ApplicationRecord
+end

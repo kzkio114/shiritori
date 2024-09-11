@@ -1,6 +1,14 @@
 Rails.application.routes.draw do
+  # Topsコントローラのルート
   root "tops#index"
-  get "tops/show"
+  # しりとりゲームのルート
+  resources :games, only: [:new, :create]
+  get "shiritori/:game_id", to: "shiritori#index", as: "shiritori_game"  # しりとりゲームのページ用ルート
+  get "shiritori/index", to: "shiritori#index", as: "shiritori"  # しりとりのインデックスページ
+
+  # その他のルート
+  get "tops/show", to: "tops#show", as: "tops_show"
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
