@@ -7,29 +7,45 @@ class GamesController < ApplicationController
     @user = User.find_or_create_by(name: params[:user_name])
     session[:user_id] = @user.id
     @game = @user.shiritori_games.create
+    @current_user = @user
 
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: turbo_stream.replace(
           "game_new_message",
           partial: "games/game_new_message",
-          locals: { game: @game}
+          locals: { game: @game , current_user: @current_user}
         )
       end
       format.html { redirect_to shiritori_game_path(@game.id) }
     end
   end
 
-  def start
-    @game = ShiritoriGame.find(params[:id])
-    @current_user = User.find(session[:user_id]) if session[:user_id]
+  def words
+    game = ShiritoriGame.find(params[:id])
+    words = game.shiritori_words.includes(:user).order(:created_at)  # 単語とユーザー情報を取得
+    render json: { words: words.map { |word| { word: word.word, user: word.user.name } } }
+  end
 
+  def start
+    @game = ShiritoriGame.find_by(id: params[:id])
+    if @game.nil?
+      redirect_to root_path, alert: 'ゲームが見つかりませんでした。'
+      return
+    end
+  
+    @current_user = User.find_by(id: session[:user_id])
+    if @current_user.nil?
+      redirect_to root_path, alert: 'セッションが無効です。もう一度ログインしてください。'
+      return
+    end
+  
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: turbo_stream.replace(
           "game_play_start",
           partial: "games/game_play_start",
-          locals: { game: @game , current_user: @current_user }
+          locals: { game: @game, current_user: @current_user }
         )
       end
       format.html { redirect_to shiritori_game_path(@game.id) }

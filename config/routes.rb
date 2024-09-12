@@ -3,8 +3,9 @@ Rails.application.routes.draw do
   root "tops#index"
   # しりとりゲームのルート
   resources :games, only: [:new, :create] do
-   member do
-      post 'start'
+    member do
+      post 'start', to: 'games#start', as: 'start'
+      get :words  # ゲームIDに紐づいた単語を取得するエンドポイント
     end
   end
 

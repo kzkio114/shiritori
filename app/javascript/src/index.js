@@ -6,7 +6,6 @@ const mountReactApp = () => {
   const container = document.getElementById('root');
   if (container && !container.hasChildNodes()) {
     const gameId = container.getAttribute('data-game-id');
-    console.log('Game ID:', gameId); // デバッグ用
     const currentUser = container.getAttribute('data-current-user');
     const root = createRoot(container);
     root.render(<ShiritoriApp gameId={gameId} currentUser={currentUser} />);
