@@ -2,7 +2,12 @@ Rails.application.routes.draw do
   # Topsコントローラのルート
   root "tops#index"
   # しりとりゲームのルート
-  resources :games, only: [:new, :create]
+  resources :games, only: [:new, :create] do
+   member do
+      post 'start'
+    end
+  end
+
   get "shiritori/:game_id", to: "shiritori#index", as: "shiritori_game"  # しりとりゲームのページ用ルート
   get "shiritori/index", to: "shiritori#index", as: "shiritori"  # しりとりのインデックスページ
 

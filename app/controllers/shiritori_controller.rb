@@ -1,6 +1,6 @@
-# app/controllers/shiritori_controller.rb
 class ShiritoriController < ApplicationController
   def index
-    @game = ShiritoriGame.find_by(id: params[:game_id])  # game_idを使ってゲームを取得
+    @game = ShiritoriGame.find_by(id: params[:game_id])
+    @current_user = User.find(session[:user_id]) if session[:user_id]
   end
 end

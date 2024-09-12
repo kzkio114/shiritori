@@ -1,16 +1,17 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App';  // ShiritoriAppを含んだコンポーネント
+import ShiritoriApp from './ShiritoriApp';
 
-// Turbo (Turbo Drive) がページを読み込んだときに実行されるイベントリスナー
-document.addEventListener('turbo:load', () => {
-  const container = document.getElementById('root');  // Reactコンポーネントをマウントするための<div id="root">
-  
+const mountReactApp = () => {
+  const container = document.getElementById('root');
   if (container && !container.hasChildNodes()) {
-    const gameId = container.getAttribute('data-game-id');  // データ属性からgameIdを取得
-    const currentUser = container.getAttribute('data-current-user');  // データ属性からcurrentUserを取得
-    
+    const gameId = container.getAttribute('data-game-id');
+    console.log('Game ID:', gameId); // デバッグ用
+    const currentUser = container.getAttribute('data-current-user');
     const root = createRoot(container);
-    root.render(<App gameId={gameId} currentUser={currentUser} />);  // Appにpropsとして渡す
+    root.render(<ShiritoriApp gameId={gameId} currentUser={currentUser} />);
   }
-});
+};
+
+document.addEventListener('turbo:load', mountReactApp);
+document.addEventListener('DOMContentLoaded', mountReactApp);

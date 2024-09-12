@@ -1,32 +1,10 @@
+<div id="game_play_start">
+</div>
 <div class="bg-teal-500 text-white p-4 rounded-lg shadow-md">
-  これはティール色の背景と白い文字です (Tailwind CSS)
+  しりとりゲームを開始しよう！
 </div>
 
-<h1>しりとりゲームを開始</h1>
+<%= render 'games/game_new_form' %>
 
-<%= form_with url: games_path, method: :post do %>
-  <div>
-    <%= label_tag :user_name, "ユーザー名" %>
-    <%= text_field_tag :user_name %>
-  </div>
+<div id="game_new_message"></div>
 
-  <div>
-    <%= submit_tag "ゲーム開始" %>
-  </div>
-<% end %>
-
-<div id="geme_new_massage"></div>
-
-<div class="text-red-500 p-2">
-  これは赤い文字です (Tailwind CSS)
-</div>
-
-<h1 class="text-3xl font-bold">これはRailsで生成された文字です</h1>
-
-<!-- Reactのエントリーポイント -->
-<div id="root"></div>
-<%= link_to 'これは、カスタムcssのテストです。押すとページ遷移します！', shiritori_path, data: { turbo: false } %>
-
-<div class="custom cloud1">
-<%= link_to 'これは、カスタムcssのテストです。押すとページ遷移します！', tops_show_path, data: { turbo: false } %>
-</div>

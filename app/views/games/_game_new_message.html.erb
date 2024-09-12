@@ -1,0 +1,6 @@
+<div class="p-4 bg-green-500 text-dack">
+  <%= link_to 'ゲームを開始する', shiritori_game_path(game_id: @game.id), data: { turbo: false } %>
+</div>
+<div class="p-4 bg-green-500 text-dark">
+  <%= button_to 'ゲーム開始', start_game_path(@game), method: :post, data: { turbo: true }, class: "button is-primary" %>
+</div>
