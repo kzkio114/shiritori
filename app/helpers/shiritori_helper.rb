@@ -1,0 +1,2 @@
+module ShiritoriHelper
+end

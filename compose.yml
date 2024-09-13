@@ -24,6 +24,7 @@ services:
     environment:
       TZ: Asia/Tokyo
       MYSQL_PASSWORD: password
+      MECAB_PATH: /usr/lib/aarch64-linux-gnu/libmecab.so # Add this line
     ports:
       - "3000:3000"
     depends_on:

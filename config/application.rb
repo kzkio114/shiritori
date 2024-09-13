@@ -2,6 +2,15 @@ require_relative "boot"
 
 require "rails/all"
 
+require 'ffi'
+
+module YourModule
+  extend FFI::Library
+
+  # MECAB_PATH 環境変数を使用して libmecab.so を指定
+  ffi_lib ENV['MECAB_PATH'] || '/usr/lib/x86_64-linux-gnu/libmecab.so'
+end
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
@@ -15,6 +24,7 @@ module App
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
+
 
     # Configuration for the application, engines, and railties goes here.
     #

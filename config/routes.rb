@@ -1,6 +1,22 @@
 Rails.application.routes.draw do
+  get 'natto', to: 'natto#index'
+  post 'natto/parse', to: 'natto#parse', as: 'parse_natto'
+  # Topsコントローラのルート
   root "tops#index"
-  get "tops/show"
+  # しりとりゲームのルート
+  resources :games, only: [:new, :create] do
+    member do
+      post 'start', to: 'games#start', as: 'start'
+      get :words  # ゲームIDに紐づいた単語を取得するエンドポイント
+    end
+  end
+
+  get "shiritori/:game_id", to: "shiritori#index", as: "shiritori_game"  # しりとりゲームのページ用ルート
+  get "shiritori/index", to: "shiritori#index", as: "shiritori"  # しりとりのインデックスページ
+
+  # その他のルート
+  get "tops/show", to: "tops#show", as: "tops_show"
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

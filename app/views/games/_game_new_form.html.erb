@@ -1,0 +1,12 @@
+<h1>しりとりゲームを開始</h1>
+
+<%= form_with url: games_path, method: :post do %>
+  <div>
+    <%= label_tag :user_name, "ユーザー名" %>
+    <%= text_field_tag :user_name %>
+  </div>
+
+  <div>
+    <%= submit_tag "ゲーム開始" %>
+  </div>
+<% end %>
