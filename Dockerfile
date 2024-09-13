@@ -16,8 +16,8 @@ RUN apt-get update -qq && apt-get install -y \
   libmecab-dev \
   libffi-dev
 
-  ENV LD_LIBRARY_PATH="/usr/local/lib:/usr/lib"
-
+# MeCabのライブラリパスの設定
+ENV LD_LIBRARY_PATH="/usr/local/lib:/usr/lib"
 
 # Node.jsとBunのリポジトリと鍵の追加
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
@@ -28,21 +28,20 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
 # Node.jsのインストール
 RUN apt-get update && apt-get install -y nodejs
 
+# ~/.bashrcにPATHを追加
+RUN echo 'export PATH="/usr/local/bin:$PATH"' >> ~/.bashrc
+
 # アプリケーションディレクトリの作成
 RUN mkdir /app
 WORKDIR /app
 
 # Gemの依存関係の解決
-COPY Gemfile* /app/
+COPY Gemfile Gemfile.lock /app/
 RUN gem update --system
 RUN gem install bundler && bundle install
 
-# Railsのインストール
+# Railsのインストールとバージョン確認
 RUN gem install rails
-RUN which rails
-RUN echo $PATH
-
-# Railsのバージョンを確認
 RUN /usr/local/bundle/bin/rails --version
 
 # Railsがインストールされている場所をパスに追加
