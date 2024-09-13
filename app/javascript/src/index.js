@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import ShiritoriApp from './ShiritoriApp';
+import ShiritoriGame from './components/ShiritoriGame';
 
 const mountReactApp = () => {
   const container = document.getElementById('root');
@@ -8,7 +8,7 @@ const mountReactApp = () => {
     const gameId = container.getAttribute('data-game-id');
     const currentUser = container.getAttribute('data-current-user');
     const root = createRoot(container);
-    root.render(<ShiritoriApp gameId={gameId} currentUser={currentUser} />);
+    root.render(<ShiritoriGame gameId={gameId} currentUser={currentUser} />);
   }
 };
 

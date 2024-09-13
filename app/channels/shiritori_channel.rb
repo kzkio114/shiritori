@@ -1,10 +1,8 @@
-# app/channels/shiritori_channel.rb
 class ShiritoriChannel < ApplicationCable::Channel
   def subscribed
     @game = ShiritoriGame.find(params[:game_id])
     stream_for @game  # ゲームに接続している全クライアントにブロードキャスト
 
-    # 接続されたことをブロードキャストで通知
     ShiritoriChannel.broadcast_to(@game, {
       action: 'joined',
       user: current_user.name
@@ -12,29 +10,47 @@ class ShiritoriChannel < ApplicationCable::Channel
   end
 
   def speak(data)
-    # 新しい単語を保存
     word = @game.shiritori_words.build(user: current_user, word: data['word'])
 
-    if word.save
-      # ゲームに参加している全ユーザーに対してブロードキャスト
-      ShiritoriChannel.broadcast_to(@game, {
-        action: 'create',
-        word: word.word,
-        user: word.user.name
-      })
+    if valid_shiritori_rule?(word)
+      if word.save
+        ShiritoriChannel.broadcast_to(@game, {
+          action: 'create',
+          word: word.word,
+          user: word.user.name
+        })
+      else
+        # エラーメッセージの送信
+        ShiritoriChannel.broadcast_to(current_user, {
+          action: 'error',
+          message: word.errors.full_messages.join(', ')
+        })
+      end
     else
+      # しりとりルール違反のエラーメッセージ
       ShiritoriChannel.broadcast_to(current_user, {
         action: 'error',
-        errors: word.errors.full_messages
+        message: 'しりとりのルールが守られていません！'
       })
     end
   end
 
   def unsubscribed
-    # クライアントが接続を切断したときに他のクライアントに通知
     ShiritoriChannel.broadcast_to(@game, {
       action: 'left',
       user: current_user.name
     })
+  end
+
+  private
+
+  def valid_shiritori_rule?(new_word)
+    last_word = @game.shiritori_words.order(created_at: :desc).first
+    return true unless last_word
+
+    last_char = last_word.word[-1]
+    return false if new_word.word[-1] == 'ん'
+
+    new_word.word.starts_with?(last_char)
   end
 end

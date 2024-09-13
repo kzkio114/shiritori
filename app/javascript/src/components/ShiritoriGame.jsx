@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import consumer from '../channels/consumer';
+import consumer from '../../channels/consumer';
 import axios from 'axios';
 
-const ShiritoriApp = ({ gameId, currentUser }) => {
+const ShiritoriGame = ({ gameId, currentUser }) => {
   const [words, setWords] = useState([]);
   const [messages, setMessages] = useState([]);
   const [newWord, setNewWord] = useState('');
@@ -109,4 +109,4 @@ const ShiritoriApp = ({ gameId, currentUser }) => {
   );
 };
 
-export default ShiritoriApp;
+export default ShiritoriGame;
