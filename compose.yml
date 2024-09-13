@@ -1,6 +1,6 @@
 services:
   db:
-    image: mysql:8.0
+    image: mysql:latest
     platform: linux/amd64
     environment:
       TZ: Asia/Tokyo
@@ -8,8 +8,6 @@ services:
       MYSQL_DATABASE: myapp_development
       MYSQL_USER: myapp
       MYSQL_PASSWORD: myapppassword
-      innodb_log_file_size: 64M
-      innodb_buffer_pool_size: 256M
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
@@ -26,6 +24,7 @@ services:
     environment:
       TZ: Asia/Tokyo
       MYSQL_PASSWORD: password
+      MECAB_PATH: /usr/lib/aarch64-linux-gnu/libmecab.so # Add this line
     ports:
       - "3000:3000"
     depends_on:

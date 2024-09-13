@@ -1,3 +1,4 @@
+# ベースイメージの指定
 FROM ruby:3.3.1
 
 # 環境変数の設定
@@ -6,14 +7,18 @@ ENV TZ Asia/Tokyo
 
 # 必要なパッケージのインストール
 RUN apt-get update -qq && apt-get install -y \
-  ca-certificates \
-  curl \
-  gnupg \
   build-essential \
-  libpq-dev \
+  curl \
+  git \
   mecab \
   mecab-ipadic-utf8 \
-  libmecab-dev
+  libmecab-dev \
+  libffi-dev \
+  libssl-dev
+
+# MeCabのライブラリパスの設定
+ENV MECAB_PATH=/usr/lib/aarch64-linux-gnu/libmecab.so
+
 
 # Node.jsとBunのリポジトリと鍵の追加
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
@@ -35,11 +40,6 @@ RUN gem install bundler && bundle install
 
 # Railsのインストール
 RUN gem install rails
-RUN which rails
-RUN echo $PATH
-
-# Railsのバージョンを確認
-RUN /usr/local/bundle/bin/rails --version
 
 # Railsがインストールされている場所をパスに追加
 ENV PATH="/usr/local/bundle/bin:${PATH}"

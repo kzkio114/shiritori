@@ -3,7 +3,13 @@ require_relative "boot"
 require "rails/all"
 
 require 'ffi'
-FFI::Library::LIBC = '/app/vendor/mecab/lib/libmecab.so'
+
+module YourModule
+  extend FFI::Library
+
+  # MECAB_PATH 環境変数を使用して libmecab.so を指定
+  ffi_lib ENV['MECAB_PATH'] || '/usr/lib/aarch64-linux-gnu/libmecab.so'
+end
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
