@@ -1,0 +1,31 @@
+<h1>文字解析ツール</h1>
+
+<%= form_with url: parse_natto_path, method: :post, local: true do %>
+  <div>
+    <label for="text">解析するテキストを入力してください:</label>
+    <%= text_area_tag :text, @input_text, rows: 4, cols: 50 %>
+  </div>
+  <div>
+    <%= submit_tag "解析" %>
+  </div>
+<% end %>
+
+<% if @parsed_result.present? %>
+  <h2>解析結果</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>単語</th>
+        <th>詳細</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @parsed_result.each do |word| %>
+        <tr>
+          <td><%= word[:surface] %></td>
+          <td><%= word[:feature] %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>

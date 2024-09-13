@@ -8,6 +8,7 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
   const [newWord, setNewWord] = useState('');
   const [name, setName] = useState(currentUser ? currentUser.name : '');  // currentUserがいる場合は名前を設定
   const [isNameSet, setIsNameSet] = useState(!!currentUser);  // 名前が設定されているかどうかをチェック
+  const [errorMessage, setErrorMessage] = useState('');  // エラーメッセージ用の状態
 
   useEffect(() => {
     // ページロード時に過去の単語を取得
@@ -24,14 +25,18 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
         { channel: "ShiritoriChannel", game_id: gameId },
         {
           received(data) {
+            console.log('Received data:', data);  // デバッグ用
             if (data.action === 'create') {
               setWords((prevWords) => [...prevWords, { word: data.word, user: data.user }]);
             } else if (data.action === 'joined') {
               setMessages((prevMessages) => [...prevMessages, `${data.user} has joined the game.`]);
             } else if (data.action === 'left') {
               setMessages((prevMessages) => [...prevMessages, `${data.user} has left the game.`]);
+            } else if (data.action === 'error') {
+              console.error('エラーメッセージが届きました:', data.message);  // ここでエラーメッセージのログを出力
+              // エラーメッセージを表示
+              setErrorMessage(data.message || 'エラーが発生しました！');
             }
-            console.log('Received data:', data);  // デバッグ用
           }
         }
       );
@@ -54,6 +59,8 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
     e.preventDefault();
     
     if (newWord.trim() !== '') {
+      setErrorMessage('');  // エラーメッセージをリセット
+      
       // 現在の購読からperformメソッドを呼び出す（適切なインデックスを使用）
       const currentSubscription = consumer.subscriptions.subscriptions.find(sub => sub.identifier.includes(gameId));
       if (currentSubscription) {
@@ -81,6 +88,9 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
       ) : (
         <>
           <h2>しりとり (ゲームID: {gameId})</h2>
+
+          {/* エラーメッセージがある場合は表示 */}
+          {errorMessage && <p className="error-message" style={{ color: 'red' }}>{errorMessage}</p>}
 
           <ul>
             {messages.map((message, index) => (

@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get 'natto', to: 'natto#index'
+  post 'natto/parse', to: 'natto#parse', as: 'parse_natto'
   # Topsコントローラのルート
   root "tops#index"
   # しりとりゲームのルート

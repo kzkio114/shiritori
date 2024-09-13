@@ -5,7 +5,15 @@ ENV LANG C.UTF-8
 ENV TZ Asia/Tokyo
 
 # 必要なパッケージのインストール
-RUN apt-get update -qq && apt-get install -y ca-certificates curl gnupg build-essential libpq-dev
+RUN apt-get update -qq && apt-get install -y \
+  ca-certificates \
+  curl \
+  gnupg \
+  build-essential \
+  libpq-dev \
+  mecab \
+  mecab-ipadic-utf8 \
+  libmecab-dev
 
 # Node.jsとBunのリポジトリと鍵の追加
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
