@@ -290,10 +290,11 @@ DEPENDENCIES
   capybara
   cssbundling-rails
   debug
+  ffi (~> 1.17)
   jbuilder
   jsbundling-rails
   mysql2 (~> 0.5)
-  natto
+  natto (~> 1.2)
   puma (>= 5.0)
   rails (~> 7.2.1)
   redis (>= 4.0.1)

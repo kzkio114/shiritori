@@ -60,4 +60,5 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem 'natto'
+gem 'ffi', '~> 1.17'
+gem 'natto', '~> 1.2'
