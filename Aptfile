@@ -1,8 +1,0 @@
-ca-certificates
-curl
-gnupg
-build-essential
-libpq-dev
-mecab
-mecab-ipadic-utf8
-libmecab-dev
