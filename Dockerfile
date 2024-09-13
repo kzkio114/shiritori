@@ -13,7 +13,11 @@ RUN apt-get update -qq && apt-get install -y \
   libpq-dev \
   mecab \
   mecab-ipadic-utf8 \
-  libmecab-dev
+  libmecab-dev \
+  libffi-dev
+
+  ENV LD_LIBRARY_PATH="/usr/local/lib:/usr/lib"
+
 
 # Node.jsとBunのリポジトリと鍵の追加
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
