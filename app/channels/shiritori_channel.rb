@@ -25,11 +25,6 @@ class ShiritoriChannel < ApplicationCable::Channel
           message: word.errors.full_messages.join(', ')
         })
       end
-    else
-      ShiritoriChannel.broadcast_to(@game, {
-        action: 'error',
-        message: 'しりとりのルールが守られていません！'
-      })
     end
   end
 
@@ -47,50 +42,50 @@ class ShiritoriChannel < ApplicationCable::Channel
     nm = Natto::MeCab.new
     noun_count = 0
     is_valid = true
+    errors = []  # エラーメッセージを保持する配列
     
+    # 「しりとりのルールが守られていません！」を最初に追加
+    errors << 'しりとりのルールが守られていません！'
+  
     nm.parse(new_word.word) do |n|
-      # BOS/EOSは無視する
       next if n.feature.include?("BOS/EOS")
       
-      reading = n.feature.split(',')[7] # 解析結果から読み仮名を取得
+      reading = n.feature.split(',')[7]
     
+      # 「ん」で終わる場合のエラー
+      if reading && (reading[-1] == 'ン' || reading[-1] == 'ん') && !errors.include?('単語が「ん」で終わっています。')
+        errors << '単語が「ん」で終わっています。'
+        is_valid = false
+      end
+
       puts "Word: #{n.surface}, Feature: #{n.feature}"
   
-      # 読み仮名が「ん」または「ン」で終わる場合
-      if reading && (reading[-1] == 'ン' || reading[-1] == 'ん')
-        ShiritoriChannel.broadcast_to(@game, {
-          action: 'error',
-          message: '単語が「ん」で終わっています。'
-        })
-        return false
-      end
-  
-      # 名詞,一般のみ許可する
+      # 名詞,一般でない場合のエラー
       if n.feature.include?('名詞,一般')
         noun_count += 1
       elsif n.feature.include?('名詞') || n.feature.include?('動詞') || n.feature.include?('助詞') || n.feature.include?('接尾辞')
-        # 名詞,一般以外の場合、無効にする
+        unless errors.include?('名詞・一般以外の名詞が含まれています。')
+          errors << '名詞・一般以外の名詞が含まれています。'
+        end
         is_valid = false
-        break
       end
     end
-    
-    unless is_valid
+  
+    if noun_count > 1 && !errors.include?('単語に複数の名詞が含まれています。')
+      errors << '単語に複数の名詞が含まれています。'
+      is_valid = false
+    end
+  
+    # エラーメッセージが存在する場合は配列としてブロードキャスト
+    unless errors.empty?
       ShiritoriChannel.broadcast_to(@game, {
         action: 'error',
-        message: '名詞・一般以外の名詞が含まれています。'
+        messages: errors
       })
-      return false
     end
-    
-    if noun_count > 1
-      ShiritoriChannel.broadcast_to(@game, {
-        action: 'error',
-        message: '単語に複数の名詞が含まれています。'
-      })
-      return false
-    end
-    
-    true
+  
+    is_valid
   end
 end
+
+

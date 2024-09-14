@@ -6,9 +6,9 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
   const [words, setWords] = useState([]);
   const [messages, setMessages] = useState([]);
   const [newWord, setNewWord] = useState('');
-  const [name, setName] = useState(currentUser ? currentUser.name : '');  // currentUserがいる場合は名前を設定
-  const [isNameSet, setIsNameSet] = useState(!!currentUser);  // 名前が設定されているかどうかをチェック
-  const [errorMessage, setErrorMessage] = useState('');  // エラーメッセージ用の状態
+  const [name, setName] = useState(currentUser ? currentUser.name : '');
+  const [isNameSet, setIsNameSet] = useState(!!currentUser);
+  const [errorMessages, setErrorMessages] = useState([]); // エラーメッセージ用の配列
 
   useEffect(() => {
     // ページロード時に過去の単語を取得
@@ -25,7 +25,7 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
         { channel: "ShiritoriChannel", game_id: gameId },
         {
           received(data) {
-            console.log('Received data:', data);  // デバッグ用
+            console.log('Received data:', data); // 受け取ったデータを確認
             if (data.action === 'create') {
               setWords((prevWords) => [...prevWords, { word: data.word, user: data.user }]);
             } else if (data.action === 'joined') {
@@ -33,9 +33,16 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
             } else if (data.action === 'left') {
               setMessages((prevMessages) => [...prevMessages, `${data.user} has left the game.`]);
             } else if (data.action === 'error') {
-              console.error('エラーメッセージが届きました:', data.message);  // ここでエラーメッセージのログを出力
-              // エラーメッセージを表示
-              setErrorMessage(data.message || 'エラーが発生しました！');
+              console.error('エラーメッセージが届きました:', data.messages || data.message);
+          
+              // 複数のエラーメッセージが送信されるかを確認
+              if (Array.isArray(data.messages)) {
+                console.log('複数のエラーメッセージが受信されました:', data.messages);
+                setErrorMessages(data.messages);
+              } else {
+                console.log('単一のエラーメッセージが受信されました:', data.message);
+                setErrorMessages([data.message]);
+              }
             }
           }
         }
@@ -51,7 +58,7 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
   const handleNameSubmit = (e) => {
     e.preventDefault();
     if (name.trim() !== '') {
-      setIsNameSet(true);  // 名前が設定されたことを記録
+      setIsNameSet(true);
     }
   };
 
@@ -59,7 +66,7 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
     e.preventDefault();
     
     if (newWord.trim() !== '') {
-      setErrorMessage('');  // エラーメッセージをリセット
+      setErrorMessages([]);  // エラーメッセージをリセット
       
       // 現在の購読からperformメソッドを呼び出す（適切なインデックスを使用）
       const currentSubscription = consumer.subscriptions.subscriptions.find(sub => sub.identifier.includes(gameId));
@@ -90,7 +97,13 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
           <h2>しりとり (ゲームID: {gameId})</h2>
 
           {/* エラーメッセージがある場合は表示 */}
-          {errorMessage && <p className="error-message" style={{ color: 'red' }}>{errorMessage}</p>}
+          {errorMessages.length > 0 && (
+            <div className="error-messages" style={{ color: 'red' }}>
+              {errorMessages.map((message, index) => (
+                <p key={index}>{message}</p>
+              ))}
+            </div>
+          )}
 
           <ul>
             {messages.map((message, index) => (
