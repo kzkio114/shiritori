@@ -29,9 +29,9 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
             if (data.action === 'create') {
               setWords((prevWords) => [...prevWords, { word: data.word, user: data.user }]);
             } else if (data.action === 'joined') {
-              setMessages((prevMessages) => [...prevMessages, `${data.user} has joined the game.`]);
+              setMessages((prevMessages) => [...prevMessages, `${data.user}さんが参加しました。`]);
             } else if (data.action === 'left') {
-              setMessages((prevMessages) => [...prevMessages, `${data.user} has left the game.`]);
+              setMessages((prevMessages) => [...prevMessages, `${data.user}さんが退出しました。`]);
             } else if (data.action === 'error') {
               console.error('エラーメッセージが届きました:', data.message);  // ここでエラーメッセージのログを出力
               // エラーメッセージを表示
