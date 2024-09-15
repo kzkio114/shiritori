@@ -80,7 +80,7 @@ class ShiritoriChannel < ApplicationCable::Channel
     unless errors.empty?
       ShiritoriChannel.broadcast_to(@game, {
         action: 'error',
-        messages: errors
+        message: errors
       })
     end
   

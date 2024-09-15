@@ -11,46 +11,46 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
   const [errorMessages, setErrorMessages] = useState([]); // エラーメッセージ用の配列
 
   useEffect(() => {
-    // ページロード時に過去の単語を取得
+    // サーバーから過去の単語を取得
     axios.get(`/games/${gameId}/words`)
-      .then(response => {
+      .then((response) => {
         setWords(response.data.words);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("単語の取得に失敗しました:", error);
       });
 
+    // 名前が設定されている場合にActionCableを使って接続
     if (isNameSet) {
       const subscription = consumer.subscriptions.create(
         { channel: "ShiritoriChannel", game_id: gameId },
         {
           received(data) {
-            console.log('Received data:', data); // 受け取ったデータを確認
-            if (data.action === 'create') {
+            console.log("Received data:", data);
+            console.error("エラーメッセージが届きました:", data.messages);
+            if (data.action === "create") {
               setWords((prevWords) => [...prevWords, { word: data.word, user: data.user }]);
-            } else if (data.action === 'joined') {
+            } else if (data.action === "joined") {
               setMessages((prevMessages) => [...prevMessages, `${data.user} has joined the game.`]);
-            } else if (data.action === 'left') {
+            } else if (data.action === "left") {
               setMessages((prevMessages) => [...prevMessages, `${data.user} has left the game.`]);
-            } else if (data.action === 'error') {
-              console.error('エラーメッセージが届きました:', data.messages || data.message);
-          
-              // 複数のエラーメッセージが送信されるかを確認
-              if (Array.isArray(data.messages)) {
-                console.log('複数のエラーメッセージが受信されました:', data.messages);
+            } else if (data.action === "error") {
+              console.log(errorMessages);
+              console.error("エラーメッセージが届きました:", data.messages)
+
+              // data.messagesが存在する場合はそれを使う
+              if (Array.isArray(data.messages) && data.messages.length > 0) {
                 setErrorMessages(data.messages);
               } else {
-                console.log('単一のエラーメッセージが受信されました:', data.message);
-                setErrorMessages([data.message]);
+                setErrorMessages([]);  // エラーメッセージがない場合はリセット
               }
             }
           }
         }
       );
-  
-      // コンポーネントがアンマウントされる際にWebSocketを解除
+
       return () => {
-        subscription.unsubscribe();
+        subscription.unsubscribe(); // コンポーネントのアンマウント時にWebSocketを解除
       };
     }
   }, [gameId, isNameSet]);
@@ -98,7 +98,7 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
 
           {/* エラーメッセージがある場合は表示 */}
           {errorMessages.length > 0 && (
-            <div className="error-messages" style={{ color: 'red' }}>
+            <div className="text-purple-700 font-bold">
               {errorMessages.map((message, index) => (
                 <p key={index}>{message}</p>
               ))}
