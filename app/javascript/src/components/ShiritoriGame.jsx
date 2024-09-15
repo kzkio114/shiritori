@@ -6,8 +6,8 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
   const [words, setWords] = useState([]);
   const [messages, setMessages] = useState([]);
   const [newWord, setNewWord] = useState('');
-  const [name, setName] = useState(currentUser ? currentUser.name : '');
-  const [isNameSet, setIsNameSet] = useState(!!currentUser);
+  const [name, setName] = useState(currentUser?.name || '');
+  const [isNameSet, setIsNameSet] = useState(currentUser?.name ? true : false);
   const [errorMessages, setErrorMessages] = useState([]); // エラーメッセージ用の配列
 
   // WebSocketで受信する処理を定義
@@ -43,7 +43,6 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
   };
 
   useEffect(() => {
-  
     // ページロード時に過去の単語を取得
     axios.get(`/games/${gameId}/words`)
       .then(response => {
@@ -52,31 +51,29 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
       .catch(error => {
         console.error("単語の取得に失敗しました:", error);
       });
-  
+
     // WebSocketの購読を作成
     const subscription = consumer.subscriptions.create(
       { channel: "ShiritoriChannel", game_id: gameId },
       { received }
     );
-  
+
     // コンポーネントがアンマウントされる際にWebSocketを解除
     return () => {
       subscription.unsubscribe();
     };
   }, [gameId, isNameSet]);
-  
+
   const handleNameSubmit = (e) => {
     e.preventDefault();
-    if (name.trim() !== '') {
+    const username = name.trim() !== '' ? name : 'プレイヤー';  // 名前が空の場合はデフォルト名を使用
 
-      const currentSubscription = consumer.subscriptions.subscriptions.find(sub => sub.identifier.includes(gameId));
-      if (currentSubscription) {
-        currentSubscription.perform("join", { user: name });  // 名前をサーバーに送信
-      }
-      setIsNameSet(true);
+    const currentSubscription = consumer.subscriptions.subscriptions.find(sub => sub.identifier.includes(gameId));
+    if (currentSubscription) {
+      currentSubscription.perform("join", { user: username });
     }
+    setIsNameSet(true);  // 名前がセットされた状態にする
   };
-  
 
   // handleWordSubmit関数を定義
   const handleWordSubmit = (e) => {
@@ -96,6 +93,7 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
 
   return (
     <div>
+      {/* 名前がセットされていない場合は名前入力フォームを表示 */}
       {!isNameSet ? (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
           <form onSubmit={handleNameSubmit} className="bg-white p-6 rounded shadow-lg">
