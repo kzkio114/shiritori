@@ -6,9 +6,39 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
   const [words, setWords] = useState([]);
   const [messages, setMessages] = useState([]);
   const [newWord, setNewWord] = useState('');
-  const [name, setName] = useState(currentUser ? currentUser.name : '');  // currentUserがいる場合は名前を設定
-  const [isNameSet, setIsNameSet] = useState(!!currentUser);  // 名前が設定されているかどうかをチェック
-  const [errorMessage, setErrorMessage] = useState('');  // エラーメッセージ用の状態
+  const [name, setName] = useState(currentUser ? currentUser.name : '');
+  const [isNameSet, setIsNameSet] = useState(!!currentUser);
+  const [errorMessages, setErrorMessages] = useState([]); // エラーメッセージ用の配列
+
+  // WebSocketで受信する処理を定義
+  const received = (data) => {
+    console.log('Received data:', data); // 受け取ったデータを確認
+    if (data.action === 'create') {
+      setWords((prevWords) => [...prevWords, { word: data.word, user: data.user }]);
+    } else if (data.action === 'joined') {
+      setMessages((prevMessages) => [
+        ...prevMessages, 
+        { text: `${data.user} さんが参加しました.`, className: 'message-joined' }
+      ]);
+    } else if (data.action === 'left') {
+      setMessages((prevMessages) => [
+        ...prevMessages, 
+        { text: `${data.user} さんが退出しました.`, className: 'message-left' }
+      ]);
+    } else if (data.action === 'error') {
+      console.error('エラーメッセージが届きました:', data.messages || data.message);
+      setMessages((prevMessages) => [
+        ...prevMessages, 
+        { text: data.message, className: 'message-error' }
+      ]);
+      
+      if (Array.isArray(data.messages)) {
+        setErrorMessages(data.messages);
+      } else {
+        setErrorMessages([data.message]);
+      }
+    }
+  };
 
   useEffect(() => {
     // ページロード時に過去の単語を取得
@@ -20,38 +50,22 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
         console.error("単語の取得に失敗しました:", error);
       });
 
-    if (isNameSet) {
-      const subscription = consumer.subscriptions.create(
-        { channel: "ShiritoriChannel", game_id: gameId },
-        {
-          received(data) {
-            console.log('Received data:', data);  // デバッグ用
-            if (data.action === 'create') {
-              setWords((prevWords) => [...prevWords, { word: data.word, user: data.user }]);
-            } else if (data.action === 'joined') {
-              setMessages((prevMessages) => [...prevMessages, `${data.user}さんが参加しました。`]);
-            } else if (data.action === 'left') {
-              setMessages((prevMessages) => [...prevMessages, `${data.user}さんが退出しました。`]);
-            } else if (data.action === 'error') {
-              console.error('エラーメッセージが届きました:', data.message);  // ここでエラーメッセージのログを出力
-              // エラーメッセージを表示
-              setErrorMessage(data.message || 'エラーが発生しました！');
-            }
-          }
-        }
-      );
-  
-      // コンポーネントがアンマウントされる際にWebSocketを解除
-      return () => {
-        subscription.unsubscribe();
-      };
-    }
-  }, [gameId, isNameSet]);
+    // WebSocketの購読を作成
+    const subscription = consumer.subscriptions.create(
+      { channel: "ShiritoriChannel", game_id: gameId },
+      { received }
+    );
+
+    // コンポーネントがアンマウントされる際にWebSocketを解除
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [gameId]);
 
   const handleNameSubmit = (e) => {
     e.preventDefault();
     if (name.trim() !== '') {
-      setIsNameSet(true);  // 名前が設定されたことを記録
+      setIsNameSet(true);
     }
   };
 
@@ -59,7 +73,7 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
     e.preventDefault();
     
     if (newWord.trim() !== '') {
-      setErrorMessage('');  // エラーメッセージをリセット
+      setErrorMessages([]);  // エラーメッセージをリセット
       
       // 現在の購読からperformメソッドを呼び出す（適切なインデックスを使用）
       const currentSubscription = consumer.subscriptions.subscriptions.find(sub => sub.identifier.includes(gameId));
@@ -90,11 +104,17 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
           <h2>しりとり (ゲームID: {gameId})</h2>
 
           {/* エラーメッセージがある場合は表示 */}
-          {errorMessage && <p className="error-message" style={{ color: 'red' }}>{errorMessage}</p>}
+          {errorMessages.length > 0 && (
+            <div className="error-messages">
+              {errorMessages.map((message, index) => (
+                <p key={index}>{message}</p>
+              ))}
+            </div>
+          )}
 
           <ul>
             {messages.map((message, index) => (
-              <li key={index}>{message}</li>
+              <li key={index} className={message.className}>{message.text}</li>
             ))}
           </ul>
 
