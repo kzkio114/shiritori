@@ -3,3 +3,5 @@
 @tailwind components; // Tailwind CSS のコンポーネントスタイルを読み込む
 @tailwind utilities; // Tailwind CSS のユーティリティクラスを読み込む
 @import "custom"; // カスタムスタイルのインポート（参考用）
+@import "message_colors"; // メッセージスタイルのインポート
+@import "modal"; // モーダルスタイルのインポート
