@@ -2,6 +2,5 @@
   <h2>新しいしりとりゲームが作成されました！</h2>
   <p>ゲームID: <%= game.id %></p>
   <p>ユーザー名: <%= current_user.name %></p>
-  <%= link_to 'ゲームに参加する', shiritori_game_path(@game.id), data: { turbo: true }, class: 'button is-primary' %>
-  <%= button_to 'ゲーム開始', start_game_path(id: @game.id), method: :post, class: 'button' %>
+  <%= link_to 'ゲームを開始', shiritori_game_path(@game.id), data: { turbo: true }, class: 'button is-primary' %>
 </div>

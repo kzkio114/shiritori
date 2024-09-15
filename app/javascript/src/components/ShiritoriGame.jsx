@@ -16,14 +16,16 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
     if (data.action === 'create') {
       setWords((prevWords) => [...prevWords, { word: data.word, user: data.user }]);
     } else if (data.action === 'joined') {
+      if (data.user && data.user.trim() !== '') {
       setMessages((prevMessages) => [
         ...prevMessages, 
-        { text: `${data.user} さんが参加しました.`, className: 'message-joined' }
+        { text: `${data.user} さんが参加しました。`, className: 'message-joined' }
       ]);
+    }
     } else if (data.action === 'left') {
       setMessages((prevMessages) => [
         ...prevMessages, 
-        { text: `${data.user} さんが退出しました.`, className: 'message-left' }
+        { text: `${data.user} さんが退出しました。`, className: 'message-left' }
       ]);
     } else if (data.action === 'error') {
       console.error('エラーメッセージが届きました:', data.messages || data.message);
@@ -41,6 +43,7 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
   };
 
   useEffect(() => {
+  
     // ページロード時に過去の単語を取得
     axios.get(`/games/${gameId}/words`)
       .then(response => {
@@ -49,26 +52,33 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
       .catch(error => {
         console.error("単語の取得に失敗しました:", error);
       });
-
+  
     // WebSocketの購読を作成
     const subscription = consumer.subscriptions.create(
       { channel: "ShiritoriChannel", game_id: gameId },
       { received }
     );
-
+  
     // コンポーネントがアンマウントされる際にWebSocketを解除
     return () => {
       subscription.unsubscribe();
     };
-  }, [gameId]);
-
+  }, [gameId, isNameSet]);
+  
   const handleNameSubmit = (e) => {
     e.preventDefault();
     if (name.trim() !== '') {
+
+      const currentSubscription = consumer.subscriptions.subscriptions.find(sub => sub.identifier.includes(gameId));
+      if (currentSubscription) {
+        currentSubscription.perform("join", { user: name });  // 名前をサーバーに送信
+      }
       setIsNameSet(true);
     }
   };
+  
 
+  // handleWordSubmit関数を定義
   const handleWordSubmit = (e) => {
     e.preventDefault();
     
@@ -80,23 +90,28 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
       if (currentSubscription) {
         currentSubscription.perform("speak", { word: newWord });
       }
-      setNewWord('');
+      setNewWord('');  // 入力フィールドをクリア
     }
   };
 
   return (
     <div>
       {!isNameSet ? (
-        <div className="modal">
-          <form onSubmit={handleNameSubmit}>
-            <h2>名前を入力してください</h2>
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
+          <form onSubmit={handleNameSubmit} className="bg-white p-6 rounded shadow-lg">
+            <h2 className="text-xl font-bold mb-4">名前を入力してください</h2>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="名前"
+              className="border border-gray-300 p-2 rounded w-full mb-4"
             />
-            <button type="submit">参加する</button>
+            <button type="submit"
+            className="bg-blue-500 text-dark px-4 py-2 rounded hover:bg-blue-600"
+            >
+            参加する
+            </button>
           </form>
         </div>
       ) : (

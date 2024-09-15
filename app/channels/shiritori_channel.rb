@@ -3,8 +3,30 @@ class ShiritoriChannel < ApplicationCable::Channel
     @game = ShiritoriGame.find(params[:game_id])
     stream_for @game
 
+    # デバッグログを追加
+    Rails.logger.debug("Current user: #{current_user.inspect}")
+
+    # 加入時のメッセージを送信
     ShiritoriChannel.broadcast_to(@game, {
       action: 'joined',
+      user: current_user.name
+    })
+  end
+
+  def join(data)
+    user_name = data['user'].strip  # 名前の前後の空白を削除
+    return if user_name.blank?  # 空白名は処理しない
+  
+    current_user.update(name: user_name)  # 名前を更新
+    ShiritoriChannel.broadcast_to(@game, {
+      action: 'joined',
+      user: user_name
+    })
+  end
+  
+  def unsubscribed
+    ShiritoriChannel.broadcast_to(@game, {
+      action: 'left',
       user: current_user.name
     })
   end
@@ -26,13 +48,6 @@ class ShiritoriChannel < ApplicationCable::Channel
         })
       end
     end
-  end
-
-  def unsubscribed
-    ShiritoriChannel.broadcast_to(@game, {
-      action: 'left',
-      user: current_user.name
-    })
   end
 
   private
