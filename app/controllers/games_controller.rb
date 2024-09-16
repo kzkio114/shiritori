@@ -51,4 +51,24 @@ class GamesController < ApplicationController
       format.html { redirect_to shiritori_game_path(@game.id) }
     end
   end
+
+  def destroy
+    @game = ShiritoriGame.find_by(id: params[:id])
+    
+    if @game.nil?
+      render json: { error: 'ゲームが見つかりませんでした' }, status: :not_found
+    else
+      # ゲーム削除を通知
+      ShiritoriChannel.broadcast_to(@game, {
+        action: 'game_end',
+        message: 'ゲームが削除されました。'
+      })
+
+      if @game.destroy
+        render json: { message: 'ゲームが正常に削除されました' }, status: :ok
+      else
+        render json: { error: 'ゲームの削除に失敗しました' }, status: :unprocessable_entity
+      end
+    end
+  end
 end

@@ -1,5 +1,5 @@
 class ShiritoriGame < ApplicationRecord
-  has_many :shiritori_words
+  has_many :shiritori_words, dependent: :destroy
 
   def last_word_ends_with
     last_word = shiritori_words.order(created_at: :desc).first
@@ -7,7 +7,7 @@ class ShiritoriGame < ApplicationRecord
   end
 
   def valid_shiritori?(new_word)
-    return true if shiritori_words.empty? 
+    return true if shiritori_words.empty?
     last_char = last_word_ends_with
     new_word.starts_with?(last_char)
   end

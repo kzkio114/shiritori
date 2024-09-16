@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   # Topsコントローラのルート
   root "tops#index"
   # しりとりゲームのルート
-  resources :games, only: [:new, :create] do
+  resources :games, only: [:new, :create, :destroy] do
     member do
       post 'start', to: 'games#start', as: 'start'
       get :words  # ゲームIDに紐づいた単語を取得するエンドポイント
