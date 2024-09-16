@@ -16,7 +16,6 @@ const ShiritoriGame = ({ gameId }) => {
   const [errorMessages, setErrorMessages] = useState([]);
   const [isLost, setIsLost] = useState(false);  // プレイヤーが負けた状態
   const [isWon, setIsWon] = useState(false);    // プレイヤーが勝った状態
-  const [modalVisible, setModalVisible] = useState(false);  // モーダルの表示状態
   const [gameEnded, setGameEnded] = useState(false);        // ゲーム終了状態
   const [gameDeleted, setGameDeleted] = useState(false);    // ゲームが削除されたかの状態
 
@@ -49,8 +48,8 @@ const ShiritoriGame = ({ gameId }) => {
     } else if (data.action === 'lose') {
       // 自分が負けた場合
       if (data.user === name) {
+        console.log("負けのモーダルを表示します。");
         setIsLost(true);
-        setModalVisible(true);
       } else {
         // 他の人が負けた場合の処理
         setMessages((prevMessages) => [
@@ -61,21 +60,16 @@ const ShiritoriGame = ({ gameId }) => {
     } else if (data.action === 'win') {
       // 自分が勝った場合
       if (data.user === name) {
+        console.log("勝ちのモーダルを表示します。");
         setIsWon(true);
-        setModalVisible(true);
       }
     } else if (data.action === 'game_end') {
-      // 先に負けや勝ちが処理されていれば、`gameEnded`が優先されないようにする
       if (!isLost && !isWon) {
+        console.log("ゲーム終了のモーダルを表示します。");
         setGameEnded(true);  // ゲーム終了状態に設定
-        setModalVisible(true);  // モーダルを表示
       }
 
       // ゲーム終了時は全員に通知
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 3000);
-
       setMessages((prevMessages) => [
         ...prevMessages,
         { text: `${data.message}`, className: 'message-lose' }
@@ -86,6 +80,9 @@ const ShiritoriGame = ({ gameId }) => {
   };
 
   useEffect(() => {
+    console.log('isLost:', isLost);
+    console.log('isWon:', isWon);
+    console.log('gameEnded:', gameEnded);
     axios.get(`/games/${gameId}/words`, {
       headers: {
         'X-CSRF-Token': csrfToken  // CSRFトークンをヘッダーに追加
@@ -137,21 +134,17 @@ const ShiritoriGame = ({ gameId }) => {
   };
 
   const handleGameEnd = () => {
-    if (gameEnded) {
-      axios.delete(`/games/${gameId}`, {
-        headers: {
-          'X-CSRF-Token': csrfToken  // CSRFトークンをヘッダーに追加
-        }
-      })
-      .then(() => {
-        window.location.href = '/';  // ルートページにリダイレクト
-      })
-      .catch(error => {
-        console.error("ゲームの削除に失敗しました:", error);
-      });
-    } else {
-      setModalVisible(false);  // ゲームが終了していない場合はモーダルを閉じるだけ
-    }
+    axios.delete(`/games/${gameId}`, {
+      headers: {
+        'X-CSRF-Token': csrfToken  // CSRFトークンをヘッダーに追加
+      }
+    })
+    .then(() => {
+      window.location.href = '/';  // ルートページにリダイレクト
+    })
+    .catch(error => {
+      console.error("ゲームの削除に失敗しました:", error);
+    });
   };
 
   return (
