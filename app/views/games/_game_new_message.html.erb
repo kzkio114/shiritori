@@ -1,6 +1,5 @@
 <div id="game_new_message">
   <h2>新しいしりとりゲームが作成されました！</h2>
   <p>ゲームID: <%= game.id %></p>
-  <p>ユーザー名: <%= current_user.name %></p>
   <%= link_to 'ゲームを開始', shiritori_game_path(@game.id), data: { turbo: true }, class: 'button is-primary' %>
 </div>

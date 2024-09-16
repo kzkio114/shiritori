@@ -14,9 +14,7 @@ services:
       - 3306:3306
   web:
     build: .
-    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
-    tty: true
-    stdin_open: true
+    command: bash -c "rm -f tmp/pids/server.pid && if [ \"$RAILS_ENV\" = 'production' ]; then bundle exec rails assets:precompile; fi && bundle exec rails s -p 3000 -b '0.0.0.0'"
     volumes:
       - .:/app
       - bundle_data:/usr/local/bundle:cached
@@ -25,6 +23,7 @@ services:
       TZ: Asia/Tokyo
       MYSQL_PASSWORD: password
       MECAB_PATH: /usr/lib/aarch64-linux-gnu/libmecab.so # Add this line
+      RAILS_ENV: development
     ports:
       - "3000:3000"
     depends_on:

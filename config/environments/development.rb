@@ -1,6 +1,12 @@
 require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
+   # アセットのオンデマンドコンパイルを有効化
+   config.assets.compile = true
+
+   # デバッグモードを有効化
+   # アセットの圧縮や結合を行わず、個別にロードする
+   config.assets.debug = true
   # Settings specified here will take precedence over those in config/application.rb.
 
   # In the development environment your application's code is reloaded any time

@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import consumer from '../../channels/consumer';
 import axios from 'axios';
 
-const ShiritoriGame = ({ gameId, currentUser }) => {
+const ShiritoriGame = ({ gameId }) => {
   const [words, setWords] = useState([]);
   const [messages, setMessages] = useState([]);
   const [newWord, setNewWord] = useState('');
-  const [name, setName] = useState(currentUser?.name || '');
-  const [isNameSet, setIsNameSet] = useState(currentUser?.name ? true : false);
+  const [name, setName] = useState('');
+  const [isNameSet, setIsNameSet] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]); // エラーメッセージ用の配列
 
   // WebSocketで受信する処理を定義
@@ -17,23 +17,23 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
       setWords((prevWords) => [...prevWords, { word: data.word, user: data.user }]);
     } else if (data.action === 'joined') {
       if (data.user && data.user.trim() !== '') {
-      setMessages((prevMessages) => [
-        ...prevMessages, 
-        { text: `${data.user} さんが参加しました。`, className: 'message-joined' }
-      ]);
-    }
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { text: `${data.user} さんが参加しました。`, className: 'message-joined' }
+        ]);
+      }
     } else if (data.action === 'left') {
       setMessages((prevMessages) => [
-        ...prevMessages, 
+        ...prevMessages,
         { text: `${data.user} さんが退出しました。`, className: 'message-left' }
       ]);
     } else if (data.action === 'error') {
       console.error('エラーメッセージが届きました:', data.messages || data.message);
       setMessages((prevMessages) => [
-        ...prevMessages, 
+        ...prevMessages,
         { text: data.message, className: 'message-error' }
       ]);
-      
+
       if (Array.isArray(data.messages)) {
         setErrorMessages(data.messages);
       } else {
@@ -62,27 +62,31 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [gameId, isNameSet]);
+  }, [gameId]);
 
   const handleNameSubmit = (e) => {
     e.preventDefault();
-    const username = name.trim() !== '' ? name : 'プレイヤー';  // 名前が空の場合はデフォルト名を使用
+    const username = name.trim();
+
+    if (username === '') {
+      setErrorMessages(['名前を入力してください']);
+      return;
+    }
 
     const currentSubscription = consumer.subscriptions.subscriptions.find(sub => sub.identifier.includes(gameId));
     if (currentSubscription) {
       currentSubscription.perform("join", { user: username });
     }
     setIsNameSet(true);  // 名前がセットされた状態にする
+    setErrorMessages([]); // エラーメッセージをクリア
   };
 
-  // handleWordSubmit関数を定義
   const handleWordSubmit = (e) => {
     e.preventDefault();
-    
+
     if (newWord.trim() !== '') {
       setErrorMessages([]);  // エラーメッセージをリセット
-      
-      // 現在の購読からperformメソッドを呼び出す（適切なインデックスを使用）
+
       const currentSubscription = consumer.subscriptions.subscriptions.find(sub => sub.identifier.includes(gameId));
       if (currentSubscription) {
         currentSubscription.perform("speak", { word: newWord });
@@ -93,11 +97,10 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
 
   return (
     <div>
-      {/* 名前がセットされていない場合は名前入力フォームを表示 */}
       {!isNameSet ? (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
           <form onSubmit={handleNameSubmit} className="bg-white p-6 rounded shadow-lg">
-            <h2 className="text-xl font-bold mb-4">名前を入力してください</h2>
+            <h2 className="text-xl font-bold mb-4">名前をしてください</h2>
             <input
               type="text"
               value={name}
@@ -105,10 +108,20 @@ const ShiritoriGame = ({ gameId, currentUser }) => {
               placeholder="名前"
               className="border border-gray-300 p-2 rounded w-full mb-4"
             />
+            {errorMessages.length > 0 ? (
+              <div className="error-messages text-red-500 mb-4">
+                {errorMessages.map((message, index) => (
+                  <p key={index}>{message}</p>
+                ))}
+              </div>
+            ) : (
+              <div className="error-messages mb-4" style={{ minHeight: '20px'}}>
+              </div>
+            )}
             <button type="submit"
-            className="bg-blue-500 text-dark px-4 py-2 rounded hover:bg-blue-600"
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
             >
-            参加する
+              参加する
             </button>
           </form>
         </div>
