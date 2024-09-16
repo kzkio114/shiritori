@@ -5,7 +5,10 @@ class GamesController < ApplicationController
 
   def create
     @user = User.find_or_create_by(name: params[:user_name])
-    cookies.signed[:user_id] = { value: @user.id, expires: 1.hour.from_now }  # クッキーにユーザーIDを保存
+    
+    # クッキーにユーザーIDを保存（httpOnlyとsecureオプションを追加）
+    cookies.signed[:user_id] = { value: @user.id, expires: 1.hour.from_now, http_only: true, secure: Rails.env.production? }
+
     @game = @user.shiritori_games.create
     @current_user = @user
 
@@ -14,7 +17,7 @@ class GamesController < ApplicationController
         render turbo_stream: turbo_stream.replace(
           "game_new_message",
           partial: "games/game_new_message",
-          locals: { game: @game , current_user: @current_user }
+          locals: { game: @game, current_user: @current_user }
         )
       end
       format.html { redirect_to shiritori_game_path(@game.id) }

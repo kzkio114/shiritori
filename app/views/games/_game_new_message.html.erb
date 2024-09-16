@@ -1,5 +1,9 @@
-<div id="game_new_message">
-  <h2>新しいしりとりゲームが作成されました！</h2>
-  <p>ゲームID: <%= game.id %></p>
-  <%= link_to 'ゲームを開始', shiritori_game_path(@game.id), data: { turbo: true }, class: 'button is-primary' %>
+<div id="game_new_message" class="p-6 bg-base-200 rounded-lg space-y-6">
+  <h1 class="text-xl font-bold mb-4 text-primary text-center">ゲームが作成されました！</h1>
+
+  <!-- ゲームIDとリンクを中央にするためにflexboxを使用し、横方向のスペースを追加 -->
+  <div class="flex flex-row items-center justify-center space-x-4">
+    <p class="text-base-content text-center">ゲームID: <%= game.id %></p>
+    <%= link_to 'ゲームを開始', shiritori_game_path(@game.id), data: { turbo: true }, class: 'bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-8' %>
+  </div>
 </div>

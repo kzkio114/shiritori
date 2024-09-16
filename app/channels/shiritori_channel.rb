@@ -3,6 +3,9 @@ class ShiritoriChannel < ApplicationCable::Channel
     @game = ShiritoriGame.find(params[:game_id])
     stream_for @game
 
+    # current_user の確認用ログ
+    logger.debug "Current user at subscribed: #{current_user.name}"
+
     # 加入時のメッセージを全員に送信
     ShiritoriChannel.broadcast_to(@game, {
       action: 'joined',
