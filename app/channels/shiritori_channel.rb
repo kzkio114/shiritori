@@ -67,6 +67,8 @@ class ShiritoriChannel < ApplicationCable::Channel
         next if n.feature.include?("BOS/EOS")
         
         reading = n.feature.split(',')[7]
+
+        puts "Word: #{n.surface}, Feature: #{n.feature}"
   
         # 「ん」で終わる場合のエラーと負け処理
         if reading && (reading[-1] == 'ン' || reading[-1] == 'ん')
@@ -78,15 +80,6 @@ class ShiritoriChannel < ApplicationCable::Channel
             action: 'lose',
             user: current_user.name
           })
-  
-          # # 勝者を判定して通知
-          # result = @game.process_game_end(current_user)
-          # if result[:game_over]
-          #   ShiritoriChannel.broadcast_to(@game, {
-          #     action: 'win',
-          #     user: result[:winner].name
-          #   })
-          # end
   
           # 全員にゲーム終了を通知
           ShiritoriChannel.broadcast_to(@game, {

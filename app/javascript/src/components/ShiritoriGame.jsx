@@ -8,38 +8,30 @@ const getCSRFToken = () => {
 };
 
 const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
-  console.log('Initial Current User:', initialCurrentUser); // ユーザー名の初期状態を確認
-
   const [words, setWords] = useState([]);
   const [messages, setMessages] = useState([]);
   const [newWord, setNewWord] = useState('');
-  const [name, setName] = useState(initialCurrentUser || ''); // サーバーから渡されたユーザー名を初期値に
-  const [isNameSet, setIsNameSet] = useState(!!initialCurrentUser); // 名前が渡されていればtrueに
+  const [name, setName] = useState(initialCurrentUser || '');
+  const [isNameSet, setIsNameSet] = useState(!!initialCurrentUser);
   const [errorMessages, setErrorMessages] = useState([]);
   const [isLost, setIsLost] = useState(false);
-  const [isWon, setIsWon] = useState(false);
   const [gameEnded, setGameEnded] = useState(false);
   const [gameDeleted, setGameDeleted] = useState(false);
+  const [loser, setLoser] = useState('');
 
-  console.log('Game ID:', gameId); // ゲームIDをログ
-  console.log('Is Name Set:', isNameSet); // 名前が設定されたかどうかをログ
-
-  const csrfToken = getCSRFToken(); // CSRFトークンを取得
+  const csrfToken = getCSRFToken();
 
   useEffect(() => {
-    console.log('useEffect triggered'); // useEffectが発火したことを確認
-
     axios.get(`/games/${gameId}/words`, {
       headers: {
         'X-CSRF-Token': csrfToken
       }
     })
     .then(response => {
-      console.log('Words fetched:', response.data.words); // 取得した単語リストをログ
       setWords(response.data.words);
     })
     .catch(error => {
-      console.error("単語の取得に失敗しました:", error); // エラー時のログ
+      console.error("単語の取得に失敗しました:", error);
     });
 
     const subscription = consumer.subscriptions.create(
@@ -49,64 +41,53 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
 
     return () => {
       subscription.unsubscribe();
-      console.log('WebSocket unsubscribed'); // WebSocketの購読解除をログ
     };
   }, [gameId, csrfToken]);
 
   const received = (data) => {
-    console.log('Received data:', data); // WebSocketから受信したデータをログ
-
     if (data.action === 'create') {
       setWords((prevWords) => [...prevWords, { word: data.word, user: data.user }]);
     } else if (data.action === 'joined') {
       setMessages((prevMessages) => [
         ...prevMessages,
-        { text: `${data.user} さんが参加しました。`, className: 'message-joined' }
+        { text: `${data.user} さんが参加しました。`, className: 'message-joined text-green-500' }
       ]);
     } else if (data.action === 'left') {
       setMessages((prevMessages) => [
         ...prevMessages,
-        { text: `${data.user} さんが退出しました。`, className: 'message-left' }
+        { text: `${data.user} さんが退出しました。`, className: 'message-left text-gray-500' }
       ]);
     } else if (data.action === 'error') {
       setMessages((prevMessages) => [
         ...prevMessages,
-        { text: data.message, className: 'message-error' }
+        { text: data.message, className: 'message-error text-yellow-500' }
       ]);
       setErrorMessages(Array.isArray(data.messages) ? data.messages : [data.message]);
     } else if (data.action === 'lose') {
+      console.log("負けたユーザー:", data.user);
+      setLoser(data.user);
       if (data.user === name) {
         setIsLost(true);
       } else {
         setMessages((prevMessages) => [
           ...prevMessages,
-          { text: `${data.user} さんが負けました。`, className: 'message-lose' }
+          { text: `${data.user} さんが負けました。`, className: 'message-lose text-green-500' }
         ]);
       }
-    } else if (data.action === 'win') {
-      if (data.user === name) {
-        setIsWon(true);
-      }
     } else if (data.action === 'game_end') {
-      if (!isLost && !isWon) {
-        setGameEnded(true);
-      }
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { text: `${data.message}`, className: 'message-lose' }
-      ]);
+      console.log("ゲームが終了しました");
+      setGameEnded(true);
     } else if (data.action === 'game_deleted') {
+      console.log("ゲームが削除されました");
       setGameDeleted(true);
     }
   };
 
   const handleNameSubmit = (e) => {
     e.preventDefault();
-    console.log('Name submitted:', name); // 入力された名前をログ
     const username = name.trim();
     if (username === '') {
       setErrorMessages(['名前を入力してください']);
-      console.log('Error: 名前が空です'); // エラーメッセージをログ
       return;
     }
 
@@ -120,7 +101,6 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
 
   const handleWordSubmit = (e) => {
     e.preventDefault();
-    console.log('Word submitted:', newWord); // 入力された単語をログ
     if (newWord.trim() !== '') {
       setErrorMessages([]);
       const currentSubscription = consumer.subscriptions.subscriptions.find(sub => sub.identifier.includes(gameId));
@@ -131,35 +111,38 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
     }
   };
 
+  const handleGameRestart = () => {
+    setMessages([]);
+    setWords([]);
+    setGameEnded(false);
+    setIsLost(false); // 負けた状態をリセット
+    setLoser('');     // 負けたユーザー名もリセット
+  };
+
   const handleGameEnd = () => {
-    console.log('Ending game:', gameId); // ゲーム終了操作をログ
     axios.delete(`/games/${gameId}`, {
       headers: {
         'X-CSRF-Token': csrfToken
       }
     })
     .then(() => {
-      console.log('Game deleted successfully'); // ゲーム削除成功をログ
       window.location.href = '/';
     })
     .catch(error => {
-      console.error("ゲームの削除に失敗しました:", error); // エラー時のログ
+      console.error("ゲームの削除に失敗しました:", error);
     });
   };
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col items-center justify-center">
       {!isNameSet ? (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
           <form onSubmit={handleNameSubmit} className="bg-white p-6 rounded shadow-lg">
-            <h2 className="text-xl font-bold mb-4">名前を入力してください</h2>
+            <h2 className="text-xl font-bold mb-4 text-center">名前を入力してください</h2>
             <input
               type="text"
               value={name}
-              onChange={(e) => {
-                setName(e.target.value);
-                console.log('Name input changed:', e.target.value); // 入力中の名前をログ
-              }}
+              onChange={(e) => setName(e.target.value)}
               placeholder="名前"
               className="border border-gray-300 p-2 rounded w-full mb-4"
             />
@@ -177,8 +160,8 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
         </div>
       ) : (
         <>
-          <h2>しりとり (ゲームID: {gameId})</h2>
-          <p>ユーザー名: {name}</p>
+          <h2 className="bg-teal-500 text-white p-6 rounded-lg shadow-md text-xl font-bold text-center">しりとり (ゲームID: {gameId})</h2>
+          <p className="text-lg text-green-500 text-center">ユーザー名: {name}</p>
 
           {errorMessages.length > 0 && (
             <div className="error-messages">
@@ -188,71 +171,54 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
             </div>
           )}
 
-          <ul>
+          <ul className="text-center">
             {messages.map((message, index) => (
               <li key={index} className={message.className}>{message.text}</li>
             ))}
           </ul>
 
-          <ul>
+          <ul className="text-center">
             {words.map((entry, index) => (
               <li key={index}>{entry.user}: {entry.word}</li>
             ))}
           </ul>
 
-          <form onSubmit={handleWordSubmit}>
+          <form onSubmit={handleWordSubmit} className="text-center">
             <input
               type="text"
               value={newWord}
-              onChange={(e) => {
-                setNewWord(e.target.value);
-                console.log('Word input changed:', e.target.value); // 入力中の単語をログ
-              }}
+              onChange={(e) => setNewWord(e.target.value)}
               placeholder="単語を入力"
+              className="border border-gray-300 p-2 rounded w-full mb-4"
             />
-            <button type="submit">送信</button>
+            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+              送信
+            </button>
           </form>
-
-          {isLost && !gameEnded && (
-            <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center">
-              <div className="bg-white p-6 rounded shadow-lg">
-                <h2 className="text-2xl font-bold mb-4">負けです！</h2>
-                <p className="mb-4">あなたは「ん」で負けました！</p>
-                <button
-                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                  onClick={() => setIsLost(false)}
-                >
-                  OK
-                </button>
-              </div>
-            </div>
-          )}
-
-          {isWon && !gameEnded && (
-            <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center">
-              <div className="bg-white p-6 rounded shadow-lg">
-                <h2 className="text-2xl font-bold mb-4">勝ちました！</h2>
-                <p className="mb-4">おめでとうございます！</p>
-                <button
-                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                  onClick={() => setIsWon(false)}
-                >
-                  OK
-                </button>
-              </div>
-            </div>
-          )}
 
           {gameEnded && (
             <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center">
-              <div className="bg-white p-6 rounded shadow-lg">
-                <h2 className="text-2xl font-bold mb-4">ゲーム終了！</h2>
-                <p className="mb-4">ゲームが終了しました！</p>
+              <div className="bg-white p-6 rounded shadow-lg text-center">
+                {isLost ? (
+                  <>
+                    <h2 className="text-2xl font-bold mb-4 text-red-500">ゲームが終了しました！負けたのは {loser} さんです。</h2>
+                  </>
+                ) : (
+                  <>
+                    <h2 className="text-2xl font-bold mb-4 text-green-500">残念！負けてしまいました、頑張りましょう！</h2>
+                  </>
+                )}
                 <button
-                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                  onClick={handleGameRestart}
+                >
+                  もう一度やる
+                </button>
+                <button
+                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 ml-4"
                   onClick={handleGameEnd}
                 >
-                  終了する
+                  終了してホームに戻る
                 </button>
               </div>
             </div>

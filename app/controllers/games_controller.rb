@@ -61,17 +61,16 @@ class GamesController < ApplicationController
     if @game.nil?
       render json: { error: 'ゲームが見つかりませんでした' }, status: :not_found
     else
-      # ゲーム削除を通知
+      # すべての関連する単語を削除
+      @game.shiritori_words.destroy_all
+  
+      # 単語削除を通知（必要であれば）
       ShiritoriChannel.broadcast_to(@game, {
         action: 'game_end',
-        message: 'ゲームが削除されました。'
+        message: 'ゲーム内の単語がすべて削除されました。'
       })
-
-      if @game.destroy
-        render json: { message: 'ゲームが正常に削除されました' }, status: :ok
-      else
-        render json: { error: 'ゲームの削除に失敗しました' }, status: :unprocessable_entity
-      end
+  
+      render json: { message: 'ゲーム内の単語が正常に削除されました' }, status: :ok
     end
   end
 end

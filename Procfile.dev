@@ -1,4 +1,4 @@
 js: bun run build --watch
 sass: bun run build:sass --watch
-# build: bun run build:css
+#  build: bun run build:css
 postcss: bun run build:postcss --watch
