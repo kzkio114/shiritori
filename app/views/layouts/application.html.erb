@@ -24,6 +24,8 @@
     <meta property="og:description" content="誰でも参加できるゆる〜いリアルタイムしりとりゲーム！漢字も使えて最後が「ん」で終わると負けです。ぜひ一緒にプレイしましょう！">
     <meta property="og:url" content="<%= request.original_url %>">
     <meta property="og:image" content="<%= asset_url('og.png') %>"> <!-- サムネイル画像 -->
+    <meta property="og:image:width" content="1200"> <!-- 推奨サイズに調整 -->
+    <meta property="og:image:height" content="630"> <!-- 推奨サイズに調整 -->
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ja_JP">
     
@@ -32,6 +34,8 @@
     <meta name="twitter:title" content="<%= content_for?(:title) ? yield(:title) : 'みんなでゆる〜く リアルタイムしりとり！' %>">
     <meta name="twitter:description" content="誰でも参加できるゆる〜いリアルタイムしりとりゲーム！一緒にプレイしましょう！">
     <meta name="twitter:image" content="<%= asset_url('og.png') %>">
+    <meta name="twitter:image:width" content="1200"> <!-- 推奨サイズに調整 -->
+    <meta name="twitter:image:height" content="630"> <!-- 推奨サイズに調整 -->
     <meta name="twitter:url" content="<%= request.original_url %>">
 
     <link rel="manifest" href="/manifest.json">
