@@ -1,27 +1,22 @@
 class ShiritoriChannel < ApplicationCable::Channel
   def subscribed
-    @game = ShiritoriGame.find(params[:game_id])
-    stream_for @game
-
-    # current_user の確認用ログ
-    logger.debug "Current user at subscribed: #{current_user.name}"
-
-    # 加入時のメッセージを全員に送信
-    ShiritoriChannel.broadcast_to(@game, {
-      action: 'joined',
-      user: current_user.name
-    })
+    stream_from "shiritori:#{params[:game_id]}"
+    logger.info "Current user at subscribed: #{current_user&.name}"
   end
 
   def join(data)
-    user_name = data['user'].strip  # 名前の前後の空白を削除
-    return if user_name.blank?  # 空白名は処理しない
+    # userがnilの場合、処理をスキップ
+    return if data["user"].nil?
 
-    current_user.update(name: user_name)  # ユーザー名を更新
-    ShiritoriChannel.broadcast_to(@game, {
-      action: 'joined',
-      user: user_name
-    })
+    current_user.update(name: data["user"])
+
+    # userがnilでない場合のみブロードキャスト
+    if current_user
+      ActionCable.server.broadcast "shiritori:#{params[:game_id]}", {
+        action: "joined",
+        user: current_user.name
+      }
+    end
   end
 
   def unsubscribed

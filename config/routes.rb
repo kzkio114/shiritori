@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  # config/routes.rb
+  post '/set_user', to: 'users#set_user'
+  get "users/set_user"
   get 'natto', to: 'natto#index'
   post 'natto/parse', to: 'natto#parse', as: 'parse_natto'
   # Topsコントローラのルート

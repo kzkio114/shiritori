@@ -18,6 +18,7 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
   const [gameEnded, setGameEnded] = useState(false);
   const [gameDeleted, setGameDeleted] = useState(false);
   const [loser, setLoser] = useState('');
+  const [showModal, setShowModal] = useState(!isNameSet); // 新たにshowModalステートを定義
 
   const csrfToken = getCSRFToken();
 
@@ -64,7 +65,6 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
       ]);
       setErrorMessages(Array.isArray(data.messages) ? data.messages : [data.message]);
     } else if (data.action === 'lose') {
-      console.log("負けたユーザー:", data.user);
       setLoser(data.user);
       if (data.user === name) {
         setIsLost(true);
@@ -75,10 +75,8 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
         ]);
       }
     } else if (data.action === 'game_end') {
-      console.log("ゲームが終了しました");
       setGameEnded(true);
     } else if (data.action === 'game_deleted') {
-      console.log("ゲームが削除されました");
       setGameDeleted(true);
     }
   };
@@ -91,12 +89,19 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
       return;
     }
 
+    setIsNameSet(true);
+    setErrorMessages([]);
+
     const currentSubscription = consumer.subscriptions.subscriptions.find(sub => sub.identifier.includes(gameId));
     if (currentSubscription) {
       currentSubscription.perform("join", { user: username });
+    } else {
+      consumer.subscriptions.create(
+        { channel: "ShiritoriChannel", game_id: gameId },
+        { received }
+      );
     }
-    setIsNameSet(true);
-    setErrorMessages([]);
+    setShowModal(false);  // モーダルを閉じる
   };
 
   const handleWordSubmit = (e) => {
@@ -135,7 +140,7 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center">
-      {!isNameSet ? (
+      {!isNameSet && showModal ? (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
           <form onSubmit={handleNameSubmit} className="bg-white p-6 rounded shadow-lg">
             <h2 className="text-xl font-bold mb-4 text-center">名前を入力してください</h2>

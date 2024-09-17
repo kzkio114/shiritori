@@ -1,6 +1,10 @@
+<div id="root" data-game-id="<%= @game&.id %>" data-current-user="<%= @current_user&.name || '' %>"></div>
+
 <% if @game && @current_user %>
 <div id="root" data-game-id="<%= @game.id %>" data-current-user="<%= @current_user.name %>"></div>
 <% else %>
-  <p>ゲームが見つかりません。</p><%= link_to 'ルートに戻る', root_path, data: { turbo: false }, class: 'btn btn-primary' %>
+  <!-- ゲームが見つからない場合の表示 -->
+  <p>ゲームが見つかりません。</p>
+  <%= link_to 'ルートに戻る', root_path, data: { turbo: false }, class: 'btn btn-primary' %>
+  <%= @game.id %>
 <% end %>
-
