@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import consumer from '../../channels/consumer';
 import axios from 'axios';
 
@@ -20,8 +20,15 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
   const [loser, setLoser] = useState('');
   const [showModal, setShowModal] = useState(!isNameSet); // モーダルの表示/非表示状態
   const [modalMessage, setModalMessage] = useState(''); // モーダルに表示するメッセージ用の状態
+  const wordsEndRef = useRef(null); // スクロール位置用のref
 
   const csrfToken = getCSRFToken();
+
+  useEffect(() => {
+    if (wordsEndRef.current) {
+      wordsEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [words]); // wordsが更新されるたびにスクロール
 
   useEffect(() => {
     axios.get(`/games/${gameId}/words`, {
@@ -221,6 +228,7 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
         <>
           <h2 className="bg-teal-500 text-white p-6 rounded-lg shadow-md text-xl font-bold text-center">しりとり (ゲームID: {gameId})</h2>
           <p className="text-lg text-green-500 text-center">ユーザー名: {name}</p>
+          <p className="text-lg text-blue-500 text-center">現在の単語数: {words.length}</p>
 
           {errorMessages.length > 0 && (
             <div className="error-messages">
@@ -241,6 +249,7 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
             {words.map((entry, index) => (
               <li key={index} className="whitespace-pre-wrap break-words">{entry.user}: {entry.word}</li>
             ))}
+            <div ref={wordsEndRef} /> {/* リストの最後にスクロールするためのダミー要素 */}
           </ul>
 
           <form onSubmit={handleWordSubmit} className="text-center">
