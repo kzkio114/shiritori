@@ -1,7 +1,33 @@
-<div class="bg-teal-500 text-white p-6 rounded-lg shadow-md text-xl font-bold text-center mt-8">
-    しりとりゲームを開始しよう！
+<div class="bg-teal-500 text-white p-6 rounded-lg shadow-md text-xl font-bold text-center">
+    みんなでゆる〜く リアルタイムしりとり！
 </div>
-<div class="flex flex-col items-center justify-center min-h-screen font-bold bg-base-200 p-6">
+<div class="flex flex-col items-center justify-center min-h-screen bg-base-200 p-6">
+    <div class="bg-white p-6 rounded-lg shadow-md text-lg text-gray-700 text-center my-8 max-w-2xl mx-auto">
+        <div class="bg-teal-500 text-white p-4 rounded-lg shadow-md text-xl font-bold">
+            しりとりルール説明
+        </div>
+        <div class="bg-white p-6 rounded-lg text-lg text-gray-700 text-center my-8 max-w-2xl mx-auto">
+            しりとりは誰でも参加できるゆる〜いルールのゲームです！<br/>
+            漢字も使えますが、最後が「ん」で終わると負けです。<br/>
+            ゲームはリアルタイムで進行し、順番はありませんので、<br/>
+            自由なタイミングで単語を入力して楽しみましょう！<br/>
+            <br/>
+            <strong>注意事項:</strong><br/>
+            名詞（一般）のみ使用可能です。<br/>
+            Mecabを使用して単語の種類を判定しているため、<br/>
+            正しく判定されない場合もあります。<br/>
+            不明な単語や動詞などはエラーとなることが<br/>ありますのでご注意ください。
+        </div>
+
+        <div class="text-teal-500 font-semibold">1. 新しいゲームを始める</div>  
+        ゲームID(URL)を作成して、名前を入力してスタートしましょう！
+
+        <br/><br/>
+        <div class="text-teal-500 font-semibold">2. 誰かのゲームに参加する</div>  
+        既に誰かが作成したゲームに参加できます。<br/>
+        URLに入って、他のプレイヤーと一緒に楽しみましょう！
+    </div>
+
+    <!-- ゲーム作成フォームの表示 -->
     <%= render 'games/game_new_form' %>
 </div>
-<div id="game_play_start"></div>

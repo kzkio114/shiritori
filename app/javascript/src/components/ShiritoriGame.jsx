@@ -264,6 +264,22 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
               送信
             </button>
           </form>
+                {/* Xにシェアするボタンを追加 */}
+          <div className="flex justify-center">
+            <div className="text-center">
+              <button
+                onClick={() => {
+                  const currentUrl = window.location.href;
+                  const tweetText = `現在プレイ中！しりとりゲームに参加しませんか？\n現在の単語数: ${words.length}語\n${currentUrl}`;
+                  const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+                  window.open(tweetUrl, '_blank');
+                }}
+                className="bg-blue-400 text-white px-4 py-2 rounded mt-4 hover:bg-blue-600"
+              >
+                Xにシェアする
+              </button>
+            </div>
+          </div>
         </div>
 
         {gameEnded && (
