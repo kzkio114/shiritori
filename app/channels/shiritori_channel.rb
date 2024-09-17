@@ -71,14 +71,20 @@ class ShiritoriChannel < ApplicationCable::Channel
           # 負けたプレイヤーに通知
           transmit({
             action: 'lose',
-            user: current_user.name
+            message: '残念！負けてしまいました、頑張りましょう！'
+          })
+
+          # 負けたプレイヤーに通知
+          ShiritoriChannel.broadcast_to(@game, {
+          action: 'lose',
+          user: current_user.name
           })
 
   
           # 全員にゲーム終了を通知
           ShiritoriChannel.broadcast_to(@game, {
             action: 'game_end',
-            message: 'ゲームが終了しました。'
+            message: 'ゲームが　　　？？終了しました。'
           })
   
           return is_valid

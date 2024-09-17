@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   resources :games, only: [:new, :create, :destroy] do
     member do
       post 'start', to: 'games#start', as: 'start'
+      post 'restart'  # これが必要です
       get :words  # ゲームIDに紐づいた単語を取得するエンドポイント
     end
   end

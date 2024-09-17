@@ -19,6 +19,7 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
   const [gameDeleted, setGameDeleted] = useState(false);
   const [loser, setLoser] = useState('');
   const [showModal, setShowModal] = useState(!isNameSet); // モーダルの表示/非表示状態
+  const [modalMessage, setModalMessage] = useState(''); // モーダルに表示するメッセージ用の状態
 
   const csrfToken = getCSRFToken();
 
@@ -45,7 +46,21 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
     };
   }, [gameId, csrfToken]);
 
+  useEffect(() => {
+    if (gameEnded) {
+      console.log("ゲームが終了しました");
+    }
+  }, [gameEnded]);
+  
+  useEffect(() => {
+    if (isLost) {
+      console.log("更新後のisLost:", isLost);
+      console.log("更新後のloser:", loser);
+    }
+  }, [isLost, loser]);
+
   const received = (data) => {
+    console.log("受信データ:", data);
     if (data.action === 'create') {
       setWords((prevWords) => [...prevWords, { word: data.word, user: data.user }]);
     } else if (data.action === 'joined') {
@@ -65,24 +80,44 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
       ]);
       setErrorMessages(Array.isArray(data.messages) ? data.messages : [data.message]);
     } else if (data.action === 'lose') {
-      console.log("負けたユーザー:", data.user);
-      setLoser(data.user);
-      if (data.user === name) {
-        setIsLost(true);
+      if (!data.user) {
+        setModalMessage(data.message); // ユーザーがない場合はメッセージをモーダルに表示
       } else {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { text: `${data.user} さんが負けました。`, className: 'message-lose text-green-500' }
-        ]);
+        console.log("負けたユーザー:", data.user);
+        setLoser(data.user);
+
+        // 負けたユーザーにのみモーダルメッセージを表示
+        if (data.user === name) {
+          setIsLost(true);
+          setModalMessage(data.message || '残念！負けてしまいました、頑張りましょう！');
+          console.log("更新後のisLost:", isLost);
+          console.log("更新後のloser:", loser);
+        } else {
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { text: `${data.user} さんが負けました。`, className: 'message-lose text-green-500' }
+          ]);
+        }
       }
     } else if (data.action === 'game_end') {
-      console.log("ゲームが終了しました");
-      setGameEnded(true);
+      setTimeout(() => {
+        setModalMessage((prevMessage) => prevMessage || 'ゲームが終了しました。'); // モーダルメッセージが既にあればそのまま使用
+        setGameEnded(true);
+      }, 500);
     } else if (data.action === 'game_deleted') {
       console.log("ゲームが削除されました");
       setGameDeleted(true);
     }
   };
+
+  // 状態が変更された時のログ出力
+  useEffect(() => {
+    console.log("isLost の状態が変更されました:", isLost);
+  }, [isLost]);
+
+  useEffect(() => {
+    console.log("loser の状態が変更されました:", loser);
+  }, [loser]);
 
   const handleNameSubmit = (e) => {
     e.preventDefault();
@@ -122,11 +157,22 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
   };
 
   const handleGameRestart = () => {
-    setMessages([]);
-    setWords([]);
-    setGameEnded(false);
-    setIsLost(false); // 負けた状態をリセット
-    setLoser('');     // 負けたユーザー名もリセット
+    axios.post(`/games/${gameId}/restart`, {}, {
+      headers: {
+        'X-CSRF-Token': csrfToken
+      }
+    })
+    .then(() => {
+      // サーバー側の削除処理が完了した後に状態をリセット
+      setMessages([]);
+      setWords([]);
+      setGameEnded(false);
+      setIsLost(false); // 負けた状態をリセット
+      setLoser('');     // 負けたユーザー名もリセット
+    })
+    .catch(error => {
+      console.error("ゲームの削除に失敗しました:", error);
+    });
   };
 
   const handleGameEnd = () => {
@@ -208,33 +254,42 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
             </button>
           </form>
 
-          {gameEnded && (
-            <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center">
-              <div className="bg-white p-6 rounded shadow-lg text-center">
-                {isLost ? (
-                  <>
-                    <h2 className="text-2xl font-bold mb-4 text-red-500">ゲームが終了しました！負けたのは {loser} さんです。</h2>
-                  </>
-                ) : (
-                  <>
-                    <h2 className="text-2xl font-bold mb-4 text-green-500">残念！負けてしまいました、頑張りましょう！</h2>
-                  </>
-                )}
-                <button
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                  onClick={handleGameRestart}
-                >
-                  もう一度やる
-                </button>
-                <button
-                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 ml-4"
-                  onClick={handleGameEnd}
-                >
-                  終了してホームに戻る
-                </button>
-              </div>
+        {gameEnded && (
+          <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center">
+            <div className="bg-white p-6 rounded shadow-lg text-center">
+              {/* modalMessage を表示 */}
+              <h2 className="text-2xl font-bold mb-4 text-red-500">{modalMessage}</h2>
+              
+              {isLost ? (
+                <>
+                  <h2 className="text-2xl font-bold mb-4 text-red-500">残念！負けてしまいました、頑張りましょう！</h2>
+                </>
+              ) : loser ? (
+                <>
+                  <h2 className="text-2xl font-bold mb-4 text-green-500">ゲームが終了しました！負けたのは {loser} さんです。</h2>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-2xl font-bold mb-4 text-green-500">ゲームが終了しました！</h2>
+                </>
+              )}
+              
+              <button
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                onClick={handleGameRestart}
+              >
+                もう一度やる
+              </button>
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 ml-4"
+                onClick={handleGameEnd}
+              >
+                終了してホームに戻る
+              </button>
             </div>
-          )}
+          </div>
+        )}
+
 
           {gameDeleted && (
             <div className="bg-red-500 text-white p-4 mt-4">
