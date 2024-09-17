@@ -18,7 +18,6 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
   const [gameEnded, setGameEnded] = useState(false);
   const [gameDeleted, setGameDeleted] = useState(false);
   const [loser, setLoser] = useState('');
-  const [showModal, setShowModal] = useState(!isNameSet); // 新たにshowModalステートを定義
 
   const csrfToken = getCSRFToken();
 
@@ -156,13 +155,15 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
               placeholder="名前"
               className="border border-gray-300 p-2 rounded w-full mb-4"
             />
-            {errorMessages.length > 0 && (
-              <div className="error-messages text-red-500 mb-4">
-                {errorMessages.map((message, index) => (
+            <div className="error-messages text-red-500 mb-4">
+              {errorMessages.length > 0 ? (
+                errorMessages.map((message, index) => (
                   <p key={index}>{message}</p>
-                ))}
-              </div>
-            )}
+                ))
+              ) : (
+                <p>&nbsp;</p> // 空白の要素を追加
+              )}
+            </div>
             <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
               参加する
             </button>
