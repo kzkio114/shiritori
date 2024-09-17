@@ -18,6 +18,7 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
   const [gameEnded, setGameEnded] = useState(false);
   const [gameDeleted, setGameDeleted] = useState(false);
   const [loser, setLoser] = useState('');
+  const [showModal, setShowModal] = useState(!isNameSet); // モーダルの表示/非表示状態
 
   const csrfToken = getCSRFToken();
 
