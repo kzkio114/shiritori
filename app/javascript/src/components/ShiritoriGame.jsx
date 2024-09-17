@@ -89,7 +89,7 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
         // 負けたユーザーにのみモーダルメッセージを表示
         if (data.user === name) {
           setIsLost(true);
-          setModalMessage(data.message || '残念！負けてしまいました、頑張りましょう！');
+          setModalMessage(data.message);
           console.log("更新後のisLost:", isLost);
           console.log("更新後のloser:", loser);
         } else {
@@ -236,9 +236,10 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
             ))}
           </ul>
 
-          <ul className="text-center">
+        <div className="max-w-md mx-auto">
+          <ul className="text-center overflow-auto h-[300px] border-2 border-gray-500 p-4 rounded-lg bg-white">
             {words.map((entry, index) => (
-              <li key={index}>{entry.user}: {entry.word}</li>
+              <li key={index} className="whitespace-pre-wrap break-words">{entry.user}: {entry.word}</li>
             ))}
           </ul>
 
@@ -248,12 +249,13 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
               value={newWord}
               onChange={(e) => setNewWord(e.target.value)}
               placeholder="単語を入力"
-              className="border border-gray-300 p-2 rounded w-full mb-4"
+              className="border border-gray-300 p-2 rounded w-full mt-4 mb-4"
             />
             <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
               送信
             </button>
           </form>
+        </div>
 
         {gameEnded && (
           <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center">
