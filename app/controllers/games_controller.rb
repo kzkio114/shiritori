@@ -48,7 +48,6 @@ class GamesController < ApplicationController
   end
 
   def destroy
-    users.update_all(mistakes_count: 0)
     @game = ShiritoriGame.find_by(id: params[:id])
     
     if @game.nil?

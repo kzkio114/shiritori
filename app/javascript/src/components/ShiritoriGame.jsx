@@ -319,17 +319,23 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
         )}
 
 
-          {gameDeleted && (
-            <div className="bg-red-500 text-white p-4 mt-4">
-              <p>ゲームが削除されました。ホームに戻ります。</p>
-              <button
-                className="bg-blue-500 px-4 py-2 mt-4 rounded"
-                onClick={() => window.location.href = '/'}
-              >
-                ホームに戻る
-              </button>
-            </div>
-          )}
+      {gameDeleted && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center">
+          <div
+              className="bg-white p-6 rounded shadow-lg text-center"
+              style={{ maxWidth: '600px', width: '100%', minHeight: '184px' }}
+            >
+            <h2 className="text-2xl font-bold mb-4 text-red-500">ゲームが削除されました</h2>
+            <p className="mb-4">このゲームは管理者によって削除されました。ホームに戻ります。</p>
+            <button
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              onClick={() => window.location.href = '/'}
+            >
+              ホームに戻る
+            </button>
+          </div>
+        </div>
+      )}
         </>
       )}
     </div>
