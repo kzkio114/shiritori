@@ -270,7 +270,7 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
               <button
                 onClick={() => {
                   const currentUrl = window.location.href;
-                  const tweetText = `現在プレイ中！しりとりゲームに参加しませんか？\n現在の単語数: ${words.length}語\n${currentUrl}`;
+                  const tweetText = `みんなでゆる〜く リアルタイムしりとり！\n現在プレイ中！しりとりゲームに参加しませんか？\n#しりとり #リアルタイム\n#みんなでゆる〜くリアルタイムしりとり\n現在の単語数: ${words.length}語\n${currentUrl}`;
                   const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
                   window.open(tweetUrl, '_blank');
                 }}
