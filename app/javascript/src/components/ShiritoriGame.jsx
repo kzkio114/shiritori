@@ -40,7 +40,7 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
       setWords(response.data.words);
     })
     .catch(error => {
-      console.error("単語の取得に失敗しました:", error);
+      // console.error("単語の取得に失敗しました:", error);
     });
 
     const subscription = consumer.subscriptions.create(
@@ -55,19 +55,19 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
 
   useEffect(() => {
     if (gameEnded) {
-      console.log("ゲームが終了しました");
+      // console.log("ゲームが終了しました");
     }
   }, [gameEnded]);
   
   useEffect(() => {
     if (isLost) {
-      console.log("更新後のisLost:", isLost);
-      console.log("更新後のloser:", loser);
+      // console.log("更新後のisLost:", isLost);
+      // console.log("更新後のloser:", loser);
     }
   }, [isLost, loser]);
 
   const received = (data) => {
-    console.log("受信データ:", data);
+    //console.log("受信データ:", data);
     if (data.action === 'create') {
       setWords((prevWords) => [...prevWords, { word: data.word, user: data.user }]);
     } else if (data.action === 'joined') {
@@ -90,15 +90,15 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
       if (!data.user) {
         setModalMessage(data.message); // ユーザーがない場合はメッセージをモーダルに表示
       } else {
-        console.log("負けたユーザー:", data.user);
+        // console.log("負けたユーザー:", data.user);
         setLoser(data.user);
 
         // 負けたユーザーにのみモーダルメッセージを表示
         if (data.user === name) {
           setIsLost(true);
           setModalMessage(data.message);
-          console.log("更新後のisLost:", isLost);
-          console.log("更新後のloser:", loser);
+          // console.log("更新後のisLost:", isLost);
+          // console.log("更新後のloser:", loser);
         } else {
           setMessages((prevMessages) => [
             ...prevMessages,
@@ -107,24 +107,24 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
         }
       }
     } else if (data.action === 'game_end') {
-      console.log("現在の loser:", loser);  // ここで loser の状態を確認
+      // console.log("現在の loser:", loser);  // ここで loser の状態を確認
       setTimeout(() => {
         setModalMessage((prevMessage) => prevMessage || 'ゲームが終了しました');
         setGameEnded(true);
       }, 500);
     } else if (data.action === 'game_deleted') {
-      console.log("ゲームが削除されました");
+      // console.log("ゲームが削除されました");
       setGameDeleted(true);
     }
   };
 
   // 状態が変更された時のログ出力
   useEffect(() => {
-    console.log("isLost の状態が変更されました:", isLost);
+    // console.log("isLost の状態が変更されました:", isLost);
   }, [isLost]);
 
   useEffect(() => {
-    console.log("loser の状態が変更されました:", loser);
+    // console.log("loser の状態が変更されました:", loser);
   }, [loser]);
 
   const handleNameSubmit = (e) => {
@@ -179,7 +179,7 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
       setLoser('');     // 負けたユーザー名もリセット
     })
     .catch(error => {
-      console.error("ゲームの削除に失敗しました:", error);
+      // console.error("ゲームの削除に失敗しました:", error);
     });
   };
 
@@ -193,7 +193,7 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
       window.location.href = '/';
     })
     .catch(error => {
-      console.error("ゲームの削除に失敗しました:", error);
+      // console.error("ゲームの削除に失敗しました:", error);
     });
   };
 

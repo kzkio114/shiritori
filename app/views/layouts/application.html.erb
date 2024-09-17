@@ -19,6 +19,21 @@
 
     <%= yield :head %>
 
+    <!-- OGP Meta Tags -->
+    <meta property="og:title" content="<%= content_for?(:title) ? yield(:title) : 'リアルタイムしりとりゲーム' %>">
+    <meta property="og:description" content="誰でも参加できるゆる〜いリアルタイムしりとりゲーム！漢字も使えて最後が「ん」で終わると負けです。ぜひ一緒にプレイしましょう！">
+    <meta property="og:url" content="<%= request.original_url %>">
+    <meta property="og:image" content="<%= asset_path('og.png') %>"> <!-- サムネイル画像 -->
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="ja_JP">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<%= content_for?(:title) ? yield(:title) : 'リアルタイムしりとりゲーム' %>">
+    <meta name="twitter:description" content="誰でも参加できるゆる〜いリアルタイムしりとりゲーム！一緒にプレイしましょう！">
+    <meta name="twitter:image" content="<%= asset_path('og.png') %>">
+    <meta name="twitter:url" content="<%= request.original_url %>">
+
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">

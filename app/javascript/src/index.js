@@ -11,8 +11,8 @@ const mountReactApp = () => {
     const gameId = container.getAttribute('data-game-id');
     const currentUser = container.getAttribute('data-current-user');
 
-    console.log("Game ID:", gameId); // ログを追加して確認
-    console.log("Current User:", currentUser); // currentUserが正しく取得されているか確認
+    // console.log("Game ID:", gameId); // ログを追加して確認
+    // console.log("Current User:", currentUser); // currentUserが正しく取得されているか確認
 
     if (!root) {
       root = createRoot(container);
