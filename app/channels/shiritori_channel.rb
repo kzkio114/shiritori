@@ -19,6 +19,15 @@ class ShiritoriChannel < ApplicationCable::Channel
     })
   end
 
+  def notify_mistake(player)
+    ShiritoriChannel.broadcast_to(@game, {
+      action: 'mistake',
+      user: player.name,
+      mistakes: player.mistakes_count,
+      message: "#{player.name} さんが「ん」で終わりました。現在のミス回数は #{player.mistakes_count} です。"
+    })
+  end
+
   def unsubscribed
     # 退室時のメッセージを全員に送信
     ShiritoriChannel.broadcast_to(@game, {
@@ -84,7 +93,7 @@ class ShiritoriChannel < ApplicationCable::Channel
           # 全員にゲーム終了を通知
           ShiritoriChannel.broadcast_to(@game, {
             action: 'game_end',
-            message: 'ゲームが　　　？？終了しました。'
+            message: 'ゲームが終了しました。'
           })
   
           return is_valid

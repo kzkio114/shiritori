@@ -30,6 +30,7 @@ class GamesController < ApplicationController
   end
 
   def restart
+    users.update_all(mistakes_count: 0)
     @game = ShiritoriGame.find_by(id: params[:id])
     if @game.nil?
       render json: { error: 'ゲームが見つかりませんでした' }, status: :not_found
@@ -47,6 +48,7 @@ class GamesController < ApplicationController
   end
 
   def destroy
+    users.update_all(mistakes_count: 0)
     @game = ShiritoriGame.find_by(id: params[:id])
     
     if @game.nil?

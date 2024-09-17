@@ -17,15 +17,24 @@ class ShiritoriGame < ApplicationRecord
 
   # 「ん」で終わった場合、負けたプレイヤーと勝者を判定
   def process_game_end(loser)
-    remaining_users = users.where.not(id: loser.id)
-    
-    if remaining_users.count == 1
-      # 勝者がいる場合
-      winner = remaining_users.first
-      return { winner: winner, game_over: true }
+    # ミス回数をインクリメント
+    loser.increment!(:mistakes_count)
+  
+    if loser.mistakes_count >= 5
+      # 5回目のミスでアウト
+      remaining_users = users.where.not(id: loser.id)
+  
+      if remaining_users.count == 1
+        # 勝者がいる場合
+        winner = remaining_users.first
+        return { winner: winner, game_over: true }
+      else
+        # まだ複数のプレイヤーが残っている場合
+        return { winner: nil, game_over: false }
+      end
     else
-      # まだ複数のプレイヤーが残っている場合
+      # まだゲーム続行
       return { winner: nil, game_over: false }
     end
-  end
+  end  
 end

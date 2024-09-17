@@ -100,8 +100,9 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
         }
       }
     } else if (data.action === 'game_end') {
+      console.log("現在の loser:", loser);  // ここで loser の状態を確認
       setTimeout(() => {
-        setModalMessage((prevMessage) => prevMessage || 'ゲームが終了しました。'); // モーダルメッセージが既にあればそのまま使用
+        setModalMessage((prevMessage) => prevMessage || 'ゲームが終了しました');
         setGameEnded(true);
       }, 500);
     } else if (data.action === 'game_deleted') {
