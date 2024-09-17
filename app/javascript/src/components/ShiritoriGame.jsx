@@ -65,6 +65,7 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
       ]);
       setErrorMessages(Array.isArray(data.messages) ? data.messages : [data.message]);
     } else if (data.action === 'lose') {
+      console.log("負けたユーザー:", data.user);
       setLoser(data.user);
       if (data.user === name) {
         setIsLost(true);
@@ -75,8 +76,10 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
         ]);
       }
     } else if (data.action === 'game_end') {
+      console.log("ゲームが終了しました");
       setGameEnded(true);
     } else if (data.action === 'game_deleted') {
+      console.log("ゲームが削除されました");
       setGameDeleted(true);
     }
   };
@@ -92,10 +95,12 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
     setIsNameSet(true);
     setErrorMessages([]);
 
+    // WebSocketサブスクリプションを作成または更新
     const currentSubscription = consumer.subscriptions.subscriptions.find(sub => sub.identifier.includes(gameId));
     if (currentSubscription) {
       currentSubscription.perform("join", { user: username });
     } else {
+      // 新たにサブスクリプションを作成
       consumer.subscriptions.create(
         { channel: "ShiritoriChannel", game_id: gameId },
         { received }
@@ -140,7 +145,7 @@ const ShiritoriGame = ({ gameId, initialCurrentUser }) => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center">
-      {!isNameSet && showModal ? (
+      {!isNameSet ? (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
           <form onSubmit={handleNameSubmit} className="bg-white p-6 rounded shadow-lg">
             <h2 className="text-xl font-bold mb-4 text-center">名前を入力してください</h2>

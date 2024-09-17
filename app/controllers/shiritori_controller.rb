@@ -1,13 +1,13 @@
 class ShiritoriController < ApplicationController
   def index
-    # ゲームIDでゲームを取得
+    @user = User.find_or_create_by(name: params[:user_name])
+    cookies.signed[:user_id] = { value: @user.id, expires: 1.hour.from_now, http_only: true, secure: Rails.env.production? }
+    @current_user = @user
     @game = ShiritoriGame.find_by(id: params[:game_id])
-    
-    # ユーザーがクッキーにない場合、クッキーを作成し、ユーザーに名前を設定させる
     if cookies.signed[:user_id].present?
       @current_user = User.find_by(id: cookies.signed[:user_id])
     else
-      @current_user = nil  # ユーザーが未設定の場合、後でモーダルを使って名前を設定させる
+      @current_user = nil
     end
 
     if @game.nil?

@@ -1,22 +1,22 @@
 class ShiritoriChannel < ApplicationCable::Channel
   def subscribed
-    stream_from "shiritori:#{params[:game_id]}"
-    logger.info "Current user at subscribed: #{current_user&.name}"
+    @game = ShiritoriGame.find(params[:game_id])
+    stream_for @game
+
+    # current_user の確認用ログ
+    logger.debug "Current user at subscribed: #{current_user.name}"
+
   end
 
   def join(data)
-    # userがnilの場合、処理をスキップ
-    return if data["user"].nil?
+    user_name = data['user'].strip  # 名前の前後の空白を削除
+    return if user_name.blank?  # 空白名は処理しない
 
-    current_user.update(name: data["user"])
-
-    # userがnilでない場合のみブロードキャスト
-    if current_user
-      ActionCable.server.broadcast "shiritori:#{params[:game_id]}", {
-        action: "joined",
-        user: current_user.name
-      }
-    end
+    current_user.update(name: user_name)  # ユーザー名を更新
+    ShiritoriChannel.broadcast_to(@game, {
+      action: 'joined',
+      user: user_name
+    })
   end
 
   def unsubscribed
@@ -62,8 +62,6 @@ class ShiritoriChannel < ApplicationCable::Channel
         next if n.feature.include?("BOS/EOS")
         
         reading = n.feature.split(',')[7]
-
-        puts "Word: #{n.surface}, Feature: #{n.feature}"
   
         # 「ん」で終わる場合のエラーと負け処理
         if reading && (reading[-1] == 'ン' || reading[-1] == 'ん')
@@ -75,6 +73,7 @@ class ShiritoriChannel < ApplicationCable::Channel
             action: 'lose',
             user: current_user.name
           })
+
   
           # 全員にゲーム終了を通知
           ShiritoriChannel.broadcast_to(@game, {
