@@ -10,3 +10,8 @@ one:
   name: "Test User"
   created_at: <%= Time.now %>
   updated_at: <%= Time.now %>
+
+two:
+  name: "Test User"
+  created_at: <%= Time.now %>
+  updated_at: <%= Time.now %>

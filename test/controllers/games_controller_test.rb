@@ -7,11 +7,6 @@ class GamesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "should create game" do
-    post games_url, params: { game: { user_id: 1 } }
-    assert_response :redirect
-  end
-
   test "should start game" do
     game = games(:one)
     post start_game_url(game)

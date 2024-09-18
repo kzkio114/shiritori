@@ -4,14 +4,13 @@
 # model remove the "{}" from the fixture names and add the columns immediately
 # below each fixture, per the syntax in the comments below
 #
-one: {}
-# column: value
-#
-two: {}
-# column: value
-
-# 不要な 'name' カラムを削除
-shiritori_game_1:
+one:
   user_id: 1
+  other_attribute: "value"
   created_at: <%= Time.now %>
   updated_at: <%= Time.now %>
+#
+two:
+  user_id: two # users.yml の 'two' ユーザーを参照
+  other_params: "value2"
+
