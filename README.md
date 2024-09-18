@@ -1,24 +1,39 @@
-# README
+# みんなでゆる〜く リアルタイムしりとり！
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+### 概要
 
-Things you may want to cover:
+このアプリは、誰でも参加できるゆる〜いルールのしりとりゲームです！リアルタイムで進行し、順番はなく、自由なタイミングで参加可能です。漢字も使えますが、最後が「ん」で終わると負けになります。
 
-* Ruby version
+### 工夫点
 
-* System dependencies
+### 1. リアルタイムしりとりゲーム
 
-* Configuration
+リアルタイムでゲームが進行し、ユーザーは自由に単語を入力してしりとりを続けることができます。
 
-* Database creation
+### 2. Mecabでの単語判定
 
-* Database initialization
+Mecabを活用して、入力された単語が名詞（一般）であるかを判定します。正しく判定されないこともありますので注意が必要です。
 
-* How to run the test suite
+### 注意事項
 
-* Services (job queues, cache servers, search engines, etc.)
+- 名詞（一般）のみ使用可能です。
+- Mecabで単語の種類を判定しますが、誤判定が発生する場合があります。
+- 不明な単語や動詞などはエラーになることがあります。
 
-* Deployment instructions
+### 遊び方
 
-* ...
+1. **新しいゲームを始める**
+    - ゲームID(URL)を作成し、名前を入力してスタートしましょう！
+2. **誰かのゲームに参加する**
+    - 既に作成されたゲームに参加できます。ゲームID(URL)を入力し、他のプレイヤーと楽しみましょう！
+
+### 技術スタック
+
+| カテゴリー | 使用技術 |
+| --- | --- |
+| サーバーサイド | Ruby, Ruby on Rails |
+| フロントエンド | React, Turbo |
+| データベース | MySQL |
+| デプロイ環境 | Heroku |
+| リアルタイム通信 | Action Cable |
+| しりとり判定 | Mecab |
