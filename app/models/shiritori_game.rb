@@ -1,6 +1,5 @@
 class ShiritoriGame < ApplicationRecord
   has_many :shiritori_words, dependent: :destroy
-  has_many :users
 
   # 最後の単語の最後の文字を返す
   def last_word_ends_with
@@ -10,31 +9,19 @@ class ShiritoriGame < ApplicationRecord
 
   # 新しい単語がしりとりのルールに従っているかを確認
   def valid_shiritori?(new_word)
-    return true if shiritori_words.empty?
+    return false if new_word.blank?  # 新しい単語が空の場合は無効
+    return true if shiritori_words.empty?  # 最初の単語なら無条件に許可
     last_char = last_word_ends_with
-    new_word.starts_with?(last_char)
+    new_word.start_with?(last_char)  # しりとりのルールに従っているか確認
   end
 
   # 「ん」で終わった場合、負けたプレイヤーと勝者を判定
-  def process_game_end(loser)
-    # ミス回数をインクリメント
-    loser.increment!(:mistakes_count)
-
-    if loser.mistakes_count >= 5
-      # 5回目のミスでアウト
-      remaining_users = users.where.not(id: loser.id)
-
-      if remaining_users.count == 1
-        # 勝者がいる場合
-        winner = remaining_users.first
-        { winner: winner, game_over: true }
-      else
-        # まだ複数のプレイヤーが残っている場合
-        { winner: nil, game_over: false }
-      end
+  def process_game_end(user)
+    last_word = user.shiritori_words.order(created_at: :desc).first
+    if last_word&.word&.ends_with?('ん')
+      { loser: user, game_over: true }
     else
-      # まだゲーム続行
-      { winner: nil, game_over: false }
+      { loser: nil, game_over: false }
     end
   end
 end
