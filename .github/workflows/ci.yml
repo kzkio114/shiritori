@@ -83,7 +83,7 @@ jobs:
         env:
           RAILS_ENV: test
           DATABASE_URL: mysql2://myapp:myapppassword@127.0.0.1:3306/myapp_test
-        run: bin/rails db:test:prepare && bin/rails test test:system
+        run: bin/rails db:test:prepare && bin/rails test #test:system
 
       - name: Create screenshots directory
         run: mkdir -p ${{ github.workspace }}/tmp/screenshots

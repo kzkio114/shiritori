@@ -6,7 +6,6 @@
 #
 one:
   user_id: 1
-  other_attribute: "value"
   created_at: <%= Time.now %>
   updated_at: <%= Time.now %>
 #
