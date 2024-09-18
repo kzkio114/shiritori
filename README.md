@@ -1,5 +1,9 @@
 # みんなでゆる〜く リアルタイムしりとり！
 
+[![Image from Gyazo](https://i.gyazo.com/e4690ae1680bc2c70a4a76ac70f63caa.png)](https://gyazo.com/e4690ae1680bc2c70a4a76ac70f63caa)
+
+https://github.com/user-attachments/assets/42dc455f-ba34-4ff1-a730-422b244e5cdb
+
 ### 概要
 
 このアプリは、誰でも参加できるゆる〜いルールのしりとりゲームです！リアルタイムで進行し、順番はなく、自由なタイミングで参加可能です。漢字も使えますが、最後が「ん」で終わると負けになります。
