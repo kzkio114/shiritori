@@ -18,7 +18,7 @@ class ShiritoriGame < ApplicationRecord
   # 「ん」で終わった場合、負けたプレイヤーと勝者を判定
   def process_game_end(user)
     last_word = user.shiritori_words.order(created_at: :desc).first
-    if last_word&.word&.ends_with?('ん')
+    if last_word&.word&.ends_with?("ん")
       { loser: user, game_over: true }
     else
       { loser: nil, game_over: false }
