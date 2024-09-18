@@ -8,7 +8,7 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 # db/seeds.rb
-words = ["あさ", "いえ", "うみ", "えき", "おか", "かさ", "きり", "くも", "けむり", "こめ", "さくら", "しお", "すいか", "せみ", "そら"]
+words = [ "あさ", "いえ", "うみ", "えき", "おか", "かさ", "きり", "くも", "けむり", "こめ", "さくら", "しお", "すいか", "せみ", "そら" ]
 
 new_words_count = 0
 
@@ -22,4 +22,3 @@ end
 
 puts "#{new_words_count} 単語が新しく辞書に保存されました！"
 puts "現在の辞書には合計 #{ShiritoriWordDictionary.count} 単語が保存されています！"
-
