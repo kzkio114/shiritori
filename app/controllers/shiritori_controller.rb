@@ -11,7 +11,7 @@ class ShiritoriController < ApplicationController
     end
 
     if @game.nil?
-      redirect_to root_path, notice: 'ゲームが見つかりませんでした'
+      redirect_to root_path, notice: "ゲームが見つかりませんでした"
     end
   end
 end

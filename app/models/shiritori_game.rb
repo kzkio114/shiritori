@@ -19,22 +19,22 @@ class ShiritoriGame < ApplicationRecord
   def process_game_end(loser)
     # ミス回数をインクリメント
     loser.increment!(:mistakes_count)
-  
+
     if loser.mistakes_count >= 5
       # 5回目のミスでアウト
       remaining_users = users.where.not(id: loser.id)
-  
+
       if remaining_users.count == 1
         # 勝者がいる場合
         winner = remaining_users.first
-        return { winner: winner, game_over: true }
+        { winner: winner, game_over: true }
       else
         # まだ複数のプレイヤーが残っている場合
-        return { winner: nil, game_over: false }
+        { winner: nil, game_over: false }
       end
     else
       # まだゲーム続行
-      return { winner: nil, game_over: false }
+      { winner: nil, game_over: false }
     end
-  end  
+  end
 end

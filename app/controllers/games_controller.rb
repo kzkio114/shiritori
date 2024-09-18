@@ -5,7 +5,7 @@ class GamesController < ApplicationController
 
   def create
     @user = User.find_or_create_by(name: params[:user_name])
-    
+
     cookies.signed[:user_id] = { value: @user.id, expires: 1.hour.from_now, http_only: true, secure: Rails.env.production? }
 
     @game = @user.shiritori_games.create
@@ -30,38 +30,37 @@ class GamesController < ApplicationController
   end
 
   def restart
-    
     @game = ShiritoriGame.find_by(id: params[:id])
     if @game.nil?
-      render json: { error: 'ゲームが見つかりませんでした' }, status: :not_found
+      render json: { error: "ゲームが見つかりませんでした" }, status: :not_found
       return
     end
 
     @game.shiritori_words.destroy_all
 
     ShiritoriChannel.broadcast_to(@game, {
-      action: 'restart',
-      message: 'ゲームが再開されました。'
+      action: "restart",
+      message: "ゲームが再開されました。"
     })
 
-    render json: { message: 'ゲームが再開され、すべての単語が削除されました' }, status: :ok
+    render json: { message: "ゲームが再開され、すべての単語が削除されました" }, status: :ok
   end
 
   def destroy
     @game = ShiritoriGame.find_by(id: params[:id])
-    
+
     if @game.nil?
-      render json: { error: 'ゲームが見つかりませんでした' }, status: :not_found
+      render json: { error: "ゲームが見つかりませんでした" }, status: :not_found
     else
       @game.shiritori_words.destroy_all
       @game.destroy
 
       ShiritoriChannel.broadcast_to(@game, {
-        action: 'game_deleted',
-        message: 'ゲームが削除されました。'
+        action: "game_deleted",
+        message: "ゲームが削除されました。"
       })
 
-      render json: { message: 'ゲームが正常に削除されました' }, status: :ok
+      render json: { message: "ゲームが正常に削除されました" }, status: :ok
     end
   end
 end

@@ -55,8 +55,7 @@ jobs:
 
     steps:
       - name: Install packages
-        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y google-chrome-stable curl default-mysql-client libjemalloc2 libvips
-
+        run: sudo apt-get install --no-install-recommends -y google-chrome-stable curl default-mysql-client libjemalloc2 libvips mecab libmecab-dev mecab-ipadic-utf8
       - name: Checkout code
         uses: actions/checkout@v4
 
