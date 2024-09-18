@@ -1,12 +1,8 @@
-<h1>しりとりゲームを開始</h1>
-
-<%= form_with url: games_path, method: :post do %>
-  <div>
-    <%= label_tag :user_name, "ユーザー名" %>
-    <%= text_field_tag :user_name %>
-  </div>
-
-  <div>
-    <%= submit_tag "ゲーム開始" %>
-  </div>
-<% end %>
+<div class="bg-teal-500 text-white p-6 rounded-lg shadow-md nded-lg items-center text-xl font-bold text-center">
+    しりとりを開始しよう！
+</div>
+<div id="game_new_message" class="p-6 bg-base-200 roushadow-md nded-lg items-center justify-center space-y-6">
+  <%= form_with url: games_path, method: :post, class: "space-y-4 w-full max-w-sm items-center justify-center" do %>
+    <%= submit_tag "ゲームを作成", class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+  <% end %>
+</div>

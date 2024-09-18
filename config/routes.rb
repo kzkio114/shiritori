@@ -1,12 +1,16 @@
 Rails.application.routes.draw do
+  # config/routes.rb
+  post '/set_user', to: 'users#set_user'
+  get "users/set_user"
   get 'natto', to: 'natto#index'
   post 'natto/parse', to: 'natto#parse', as: 'parse_natto'
   # Topsコントローラのルート
   root "tops#index"
   # しりとりゲームのルート
-  resources :games, only: [:new, :create] do
+  resources :games, only: [:new, :create, :destroy] do
     member do
       post 'start', to: 'games#start', as: 'start'
+      post 'restart'  # これが必要です
       get :words  # ゲームIDに紐づいた単語を取得するエンドポイント
     end
   end

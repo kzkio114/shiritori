@@ -5,7 +5,9 @@ class GamesController < ApplicationController
 
   def create
     @user = User.find_or_create_by(name: params[:user_name])
-    session[:user_id] = @user.id
+    
+    cookies.signed[:user_id] = { value: @user.id, expires: 1.hour.from_now, http_only: true, secure: Rails.env.production? }
+
     @game = @user.shiritori_games.create
     @current_user = @user
 
@@ -14,7 +16,7 @@ class GamesController < ApplicationController
         render turbo_stream: turbo_stream.replace(
           "game_new_message",
           partial: "games/game_new_message",
-          locals: { game: @game , current_user: @current_user}
+          locals: { game: @game, current_user: @current_user }
         )
       end
       format.html { redirect_to shiritori_game_path(@game.id) }
@@ -23,32 +25,43 @@ class GamesController < ApplicationController
 
   def words
     game = ShiritoriGame.find(params[:id])
-    words = game.shiritori_words.includes(:user).order(:created_at)  # 単語とユーザー情報を取得
+    words = game.shiritori_words.includes(:user).order(:created_at)
     render json: { words: words.map { |word| { word: word.word, user: word.user.name } } }
   end
 
-  def start
+  def restart
+    
     @game = ShiritoriGame.find_by(id: params[:id])
     if @game.nil?
-      redirect_to root_path, alert: 'ゲームが見つかりませんでした。'
+      render json: { error: 'ゲームが見つかりませんでした' }, status: :not_found
       return
     end
-  
-    @current_user = User.find_by(id: session[:user_id])
-    if @current_user.nil?
-      redirect_to root_path, alert: 'セッションが無効です。もう一度ログインしてください。'
-      return
-    end
-  
-    respond_to do |format|
-      format.turbo_stream do
-        render turbo_stream: turbo_stream.replace(
-          "game_play_start",
-          partial: "games/game_play_start",
-          locals: { game: @game, current_user: @current_user }
-        )
-      end
-      format.html { redirect_to shiritori_game_path(@game.id) }
+
+    @game.shiritori_words.destroy_all
+
+    ShiritoriChannel.broadcast_to(@game, {
+      action: 'restart',
+      message: 'ゲームが再開されました。'
+    })
+
+    render json: { message: 'ゲームが再開され、すべての単語が削除されました' }, status: :ok
+  end
+
+  def destroy
+    @game = ShiritoriGame.find_by(id: params[:id])
+    
+    if @game.nil?
+      render json: { error: 'ゲームが見つかりませんでした' }, status: :not_found
+    else
+      @game.shiritori_words.destroy_all
+      @game.destroy
+
+      ShiritoriChannel.broadcast_to(@game, {
+        action: 'game_deleted',
+        message: 'ゲームが削除されました。'
+      })
+
+      render json: { message: 'ゲームが正常に削除されました' }, status: :ok
     end
   end
 end
